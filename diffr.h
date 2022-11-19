@@ -1,5 +1,5 @@
-#ifndef AKINATOR_H
-#define AKINATOR_H
+#ifndef DIFFR_H
+#define DIFFR_H
 
 #include "iostr.h"
 #include "tree.h"
@@ -15,11 +15,29 @@ enum OPTIONS
     N_OPTIONS
 };
 
-enum AKINATOR_STATES
+enum NODE_TYPES
 {
-    VERTEX_IN,
-    VERTEX_LEFT,
-    VERTEX_RIGHT
+    TYPE_OP,
+    TYPE_NUM,
+    TYPE_VAR
+};
+
+enum OP_CODES
+{
+    OP_ADD,
+    OP_SUB,
+    OP_MUL,
+    OP_DIV,
+    OP_SIN,
+    OP_COS,
+    OP_EXP
+};
+
+struct Diffr
+{
+    char *filename;
+
+    Node *root;
 };
 
 extern const Option       EXEC_OPTIONS[];
@@ -34,23 +52,10 @@ struct Akinator
     char *db_filename;
 };
 
-void AkinatorCtor          (Akinator *aktr, const char *db_filename, int *err);
-void AkinatorDtor          (Akinator *aktr);
-
-void AkinatorPredict       (Akinator *aktr);
-void AkinatorCompare       (Akinator *aktr, const char *obj1, const char *obj2);
-void AkinatorDescribe      (Akinator *aktr, const char *obj);
-
-void AkinatorPrintByPath   (Node *node, Stack *stk);
-bool AkinatorFindObj       (Node *node, const char *str, Stack *stk);
-
-void AkinatorParseText     (Akinator *aktr, TextInfo *text);
-void AkinatorSaveDbToFile  (Akinator *aktr);
-void AkinatorSaveDfs       (Node *node, int32_t depth, int32_t fd);
-
-void AkinatorDumpToFile    (Akinator *aktr, const char *filename);
-void AkinatorDumpToFileDfs (Node *node, int32_t fd, int64_t idx);
-
-bool GetAnsYesNo();
-
-#endif  // AKINATOR_H
+void DiffrCtor(Diffr *diffr);
+void DiffrInput(Diffr *diffr, const char *filename, int32_t *err);
+Node *DiffrParse(int32_t pos, int32_t *end_pos, TextInfo *text);
+void DiffrDump(Diffr *diffr);
+const char *GetOperatorString(int32_t op_code);
+void DiffrDumpToFileDfs(Node *node, int32_t fd, int64_t idx);
+#endif  // DIFFR_H

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "akinator.h"
+#include "diffr.h"
 #include "colors.h"
 
 int main(int argc, const char *argv[])
@@ -8,9 +8,7 @@ int main(int argc, const char *argv[])
     int err = 0;
 
     int run_mode = HELP_OPTION;
-    const char *db_filename = "akinator_db.txt",
-               *obj1        = "null1",
-               *obj2        = "null2";
+    const char *filename = "formula.txt";
 
     int options[N_EXEC_OPTIONS] = {};
 
@@ -20,6 +18,12 @@ int main(int argc, const char *argv[])
         printf(RED "Wrong arguments\n" NORMAL);
         return 1;
     }
+
+    Diffr diffr = {};
+
+    diffr.filename = "test.txt";
+    DiffrInput(&diffr, "test.txt", &err);
+    DiffrDump(&diffr);
     
     return 0;
 }

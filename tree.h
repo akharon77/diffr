@@ -1,11 +1,21 @@
 #ifndef TREE_H
 #define TREE_H
 
+#include <stdint.h>
+
 struct Node
 {
-    char *str;
+    int32_t type;
+
+    union
+    {
+        double  dbl;
+        int32_t op;
+        char    var;
+    } value;
 
     Node *ancstr;
+
     Node *left;
     Node *right;
 };
@@ -13,8 +23,7 @@ struct Node
 void   TreeCtor(Node *tree);
 void   TreeDtor(Node *tree);
 Node  *NodeNew();
-Node*  TreeInsert(Node *anch, const char *str);
-void   NodeCtor(Node *node, const char *str);
+void NodeAddChild(Node *node, Node *child);
 bool NodeIsLeaf(Node *node);
 
 #endif  // TREE_H
