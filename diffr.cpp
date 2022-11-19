@@ -173,19 +173,19 @@ const char *GetOperatorString(int32_t op_code)
     switch (op_code)
     {
         case OP_ADD:
-            return "ADD +";
+            return "{ ADD | + }";
         case OP_SUB:
-            return "SUB -";
+            return "{ SUB | - }";
         case OP_MUL:
-            return "MUL *";
+            return "{ MUL | * }";
         case OP_DIV:
-            return "DIV /";
+            return "{ DIV | / }";
         case OP_SIN:
-            return "SIN";
+            return "{ SIN }";
         case OP_COS:
-            return "COS";
+            return "{ COS }";
         case OP_EXP:
-            return "EXP ^";
+            return "{ EXP | ^ }";
     }
 
     return "(null)";
