@@ -10,11 +10,12 @@
 #define LEFT           (CURR)->left
 #define RIGHT          (CURR)->right
 
-#define DL             DiffrDifferentiate (LEFT)
-#define DR             DiffrDifferentiate (RIGHT)
+#define D_L            Differentiate (LEFT)
+#define D_R            Differentiate (RIGHT)
 
-#define CL             TreeCopy (LEFT)
-#define CR             TreeCopy (RIGHT)
+#define CP_L           TreeCopy (LEFT)
+#define CP_R           TreeCopy (RIGHT)
+#define CP_CR          TreeCopy (CURR)
 
 #define ADD(lhs, rhs)  CreateNode (TYPE_OP, OP_ADD, lhs,          rhs)
 #define SUB(lhs, rhs)  CreateNode (TYPE_OP, OP_SUB, lhs,          rhs)
@@ -32,6 +33,8 @@
                               (node)->value.op == op_code)
 #define IS_NUM(node) ((node)->type == TYPE_NUM)
 #define IS_VAR(node) ((node)->type == TYPE_VAR)
+
+#define GET_NUM(node) ((node)->value.num)
 
 enum OPTIONS
 {

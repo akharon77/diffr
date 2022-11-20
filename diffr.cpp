@@ -201,10 +201,9 @@ const char *GetOperatorString(int32_t op_code)
     return "(null)";
 }
 
-#define LEFT  node->left
-#define RIGHT node->right
+#define CURR node
 
-void DiffrDifferentiate(Node *node)
+void Differentiate(Node *node)
 {
     ASSERT(diffr != NULL);
 
@@ -215,23 +214,32 @@ void DiffrDifferentiate(Node *node)
         case TYPE_OP:
             switch (node->value.op)
             {
-                case OP_ADD: return ADD(DL, DR);
-                case OP_SUB: return SUB(DL, DR);
+                case OP_ADD: return ADD(D_L, D_R);
+                case OP_SUB: return SUB(D_L, D_R);
 
-                case OP_MUL: return ADD(MUL(DL, CR), MUL(CL, DR));
-                case OP_DIV: return DIV(SUB(MUL(DL, CR), MUL(CL, DR)), MUL(CR, CR));
+                case OP_MUL: return ADD(MUL(D_L, CP_R), MUL(CP_L, D_R));
+                case OP_DIV: return DIV(SUB(MUL(D_L, CP_R), MUL(CP_L, D_R)), MUL(CP_R, CP_R));
 
-                case OP_SIN: return MUL(COS(CR), DR);
-                case OP_COS: return MUL(CREATE_NUM(-1), MUL(SIN(CR), DR));
+                case OP_SIN: return MUL(COS(CP_R), D_R);
+                case OP_COS: return MUL(CREATE_NUM(-1), MUL(SIN(CP_R), D_R));
 
                 case OP_EXP:
                     if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                         return CREATE_NUM(0);
                     else if (IS_NUM(LEFT) && IS_OP(RIGHT))
-                        return MUL(
+                        return MUL(EXP(CP_L, CP_R), MUL(LN(CP_L), D_R));
+                    else if (IS_OP(LEFT) && IS_NUM(RIGHT))
+                        return MUL(CREATE_NUM(GET_NUM(RIGHT) - 1), MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
+                    else
+                        {
+                            Node *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));
+                            Node *res = Differentiate(fict_node);
+                            TreeDtor(fict_node);
+
+                            return res;
+                        }
             }
     }
 }
 
-#undef LEFT
-#undef RIGHT
+#undef CURR
