@@ -234,7 +234,7 @@ Node* Differentiate(Node *node)
                     else if (IS_NUM(LEFT) && IS_OP(RIGHT))
                         return MUL(EXP(CP_L, CP_R), MUL(LN(CP_L), D_R));
                     else if (IS_OP(LEFT) && IS_NUM(RIGHT))
-                        return MUL(CREATE_NUM(GET_NUM(RIGHT) - 1), MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
+                        return MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
                     else
                         {
                             Node *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));

@@ -26,12 +26,12 @@
 #define SIN(rhs)       CreateNode (TYPE_OP, {.op = OP_SIN}, CREATE_NUM(0), rhs)
 #define COS(rhs)       CreateNode (TYPE_OP, {.op = OP_COS}, CREATE_NUM(0), rhs)
 
-#define EXP(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_EXP}, lhs,          rhs)
+#define EXP(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_EXP}, lhs,           rhs)
 #define LN(rhs)        CreateNode (TYPE_OP, {.op = OP_LN},  CREATE_NUM(0), rhs)
 
-#define IS_OP(node)  ((node)->type == TYPE_OP)
-#define IS_OP_CODE(node, op_code) (IS_OP(node) && \
-                                   (node)->value.op == op_code)
+#define IS_OP(node)               ((node)->type == TYPE_OP)
+#define IS_OP_CODE(node, op_code) (IS_OP(node) && (node)->value.op == op_code)
+
 #define IS_NUM(node) ((node)->type == TYPE_NUM)
 #define IS_VAR(node) ((node)->type == TYPE_VAR)
 

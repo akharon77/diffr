@@ -29,6 +29,7 @@ Node *NodeNew()
 Node *TreeCopy(Node *node)
 {
     Node *node_cpy = NodeNew();
+    *node_cpy = *node;
 
     if (!NodeIsLeaf(node))
     {
