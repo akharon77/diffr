@@ -210,17 +210,25 @@ void DiffrDifferentiate(Node *node)
 
     switch (node->type)
     {
-        case TYPE_NUM: return CreateNum(0);
-        case TYPE_VAR: return CreateNum(1);
+        case TYPE_NUM: return CREATE_NUM(0);
+        case TYPE_VAR: return CREATE_NUM(1);
         case TYPE_OP:
             switch (node->value.op)
             {
-                case OP_ADD: return Add(dL, dR);
-                case OP_SUB: return Sub(dL, dR);
-                case OP_MUL: return Add(Mul(dL, cR), Mul(cL, dR));
-                case OP_DIV: return Div(Sub(Mul(dL, cR), Mul(cL, dR)), Mul(cR, cR));
-                case OP_SIN: return Mul(Cos(cR), dR);
-                case OP_COS: return Mul(Num(-1), Mul(Sin(cR), dR));
+                case OP_ADD: return ADD(DL, DR);
+                case OP_SUB: return SUB(DL, DR);
+
+                case OP_MUL: return ADD(MUL(DL, CR), MUL(CL, DR));
+                case OP_DIV: return DIV(SUB(MUL(DL, CR), MUL(CL, DR)), MUL(CR, CR));
+
+                case OP_SIN: return MUL(COS(CR), DR);
+                case OP_COS: return MUL(CREATE_NUM(-1), MUL(SIN(CR), DR));
+
+                case OP_EXP:
+                    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+                        return CREATE_NUM(0);
+                    else if (IS_NUM(LEFT) && IS_OP(RIGHT))
+                        return MUL(
             }
     }
 }

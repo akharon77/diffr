@@ -5,11 +5,33 @@
 #include "tree.h"
 #include "stack.h"
 
-#define CreateNum(val) CreateNode(TYPE_NUM, val, NULL, NULL)
-#define dL             DiffrDifferentiate(LEFT)
-#define dR             DiffrDifferentiate(RIGHT)
-#define cL             TreeCopy(LEFT)
-#define cR             TreeCopy(RIGHT)
+#define CREATE_NUM(val) CreateNode (TYPE_NUM, val, NULL, NULL)
+
+#define LEFT           (CURR)->left
+#define RIGHT          (CURR)->right
+
+#define DL             DiffrDifferentiate (LEFT)
+#define DR             DiffrDifferentiate (RIGHT)
+
+#define CL             TreeCopy (LEFT)
+#define CR             TreeCopy (RIGHT)
+
+#define ADD(lhs, rhs)  CreateNode (TYPE_OP, OP_ADD, lhs,          rhs)
+#define SUB(lhs, rhs)  CreateNode (TYPE_OP, OP_SUB, lhs,          rhs)
+
+#define MUL(lhs, rhs)  CreateNode (TYPE_OP, OP_MUL, lhs,          rhs)
+#define DIV(lhs, rhs)  CreateNode (TYPE_OP, OP_DIV, lhs,          rhs)
+
+#define SIN(rhs)       CreateNode (TYPE_OP, OP_SIN, CreateNum(0), rhs)
+#define COS(rhs)       CreateNode (TYPE_OP, OP_COS, CreateNum(0), rhs)
+
+#define EXP(lhs, rhs)  CreateNode (TYPE_OP, OP_EXP, lhs,          rhs)
+#define LN(rhs)        CreateNode (TYPE_OP, OP_LN,  CreateNum(0), rhs)
+
+#define IS_OP(node, op_code) ((node)->type     == TYPE_OP && \
+                              (node)->value.op == op_code)
+#define IS_NUM(node) ((node)->type == TYPE_NUM)
+#define IS_VAR(node) ((node)->type == TYPE_VAR)
 
 enum OPTIONS
 {
