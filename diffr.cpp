@@ -23,7 +23,16 @@ void DiffrCtor(Diffr *diffr)
 {
     ASSERT(diffr != NULL);
 
-    diffr->root = NULL;
+    diffr->root     = NULL;
+    diffr->filename = NULL;
+}
+
+void DiffrDtor(Diffr *diffr)
+{
+    ASSERT(diffr != NULL);
+
+    TreeDtor(diffr->root);
+    free(diffr->filename);
 }
 
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
@@ -35,6 +44,7 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
 
     int32_t end = 0;
     diffr->root = DiffrParse(0, &end, &text);
+    diffr->filename = strdup(filename);
 
     TextInfoDtor(&text);
 }
@@ -190,3 +200,30 @@ const char *GetOperatorString(int32_t op_code)
 
     return "(null)";
 }
+
+#define LEFT  node->left
+#define RIGHT node->right
+
+void DiffrDifferentiate(Node *node)
+{
+    ASSERT(diffr != NULL);
+
+    switch (node->type)
+    {
+        case TYPE_NUM: return CreateNum(0);
+        case TYPE_VAR: return CreateNum(1);
+        case TYPE_OP:
+            switch (node->value.op)
+            {
+                case OP_ADD: return Add(dL, dR);
+                case OP_SUB: return Sub(dL, dR);
+                case OP_MUL: return Add(Mul(dL, cR), Mul(cL, dR));
+                case OP_DIV: return Div(Sub(Mul(dL, cR), Mul(cL, dR)), Mul(cR, cR));
+                case OP_SIN: return Mul(Cos(cR), dR);
+                case OP_COS: return Mul(Num(-1), Mul(Sin(cR), dR));
+            }
+    }
+}
+
+#undef LEFT
+#undef RIGHT

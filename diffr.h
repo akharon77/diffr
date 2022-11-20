@@ -5,6 +5,12 @@
 #include "tree.h"
 #include "stack.h"
 
+#define CreateNum(val) CreateNode(TYPE_NUM, val, NULL, NULL)
+#define dL             DiffrDifferentiate(LEFT)
+#define dR             DiffrDifferentiate(RIGHT)
+#define cL             TreeCopy(LEFT)
+#define cR             TreeCopy(RIGHT)
+
 enum OPTIONS
 {
     DB_FILE_OPTION,
@@ -45,17 +51,13 @@ extern const size_t       N_EXEC_OPTIONS;
 
 const int32_t MAX_STR_OBJ_LEN = 128;
 
-struct Akinator
-{
-    Node *root;
+void        DiffrCtor          (Diffr *diffr);
 
-    char *db_filename;
-};
+void        DiffrInput         (Diffr *diffr, const char *filename, int32_t *err);
+Node       *DiffrParse         (int32_t pos, int32_t *end_pos, TextInfo *text);
 
-void DiffrCtor(Diffr *diffr);
-void DiffrInput(Diffr *diffr, const char *filename, int32_t *err);
-Node *DiffrParse(int32_t pos, int32_t *end_pos, TextInfo *text);
-void DiffrDump(Diffr *diffr);
-const char *GetOperatorString(int32_t op_code);
-void DiffrDumpToFileDfs(Node *node, int32_t fd, int64_t idx);
+void        DiffrDump          (Diffr *diffr);
+void        DiffrDumpToFileDfs (Node *node, int32_t fd, int64_t idx);
+
+const char *GetOperatorString  (int32_t op_code);
 #endif  // DIFFR_H
