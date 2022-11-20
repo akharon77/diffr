@@ -27,6 +27,7 @@ void   TreeDtor     (Node *tree);
 
 Node  *NodeNew      ();
 void   NodeAddChild (Node *node, Node *child);
+Node  *TreeCopy     (Node *node);
 
 bool   NodeIsLeaf   (Node *node);
 

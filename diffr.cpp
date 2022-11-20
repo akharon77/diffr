@@ -83,6 +83,9 @@ Node *DiffrParse(int32_t pos, int32_t *end_pos, TextInfo *text)
             case '^':
                 op_code = OP_EXP;
                 break;
+            case 'l':
+                op_code = OP_LN;
+                break;
             default:
                 ASSERT(0 && RED "Wrong operator!" NORMAL);
         }
@@ -196,6 +199,8 @@ const char *GetOperatorString(int32_t op_code)
             return "{ COS }";
         case OP_EXP:
             return "{ EXP | ^ }";
+        case OP_LN:
+            return "{ LN | l }";
     }
 
     return "(null)";
@@ -203,9 +208,9 @@ const char *GetOperatorString(int32_t op_code)
 
 #define CURR node
 
-void Differentiate(Node *node)
+Node* Differentiate(Node *node)
 {
-    ASSERT(diffr != NULL);
+    ASSERT(node != NULL);
 
     switch (node->type)
     {
@@ -238,8 +243,38 @@ void Differentiate(Node *node)
 
                             return res;
                         }
+                
+                case OP_LN:
+                    return MUL(DIV(CREATE_NUM(1), CP_R), D_R);
             }
     }
 }
 
 #undef CURR
+
+Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
+{
+    Node *node = NodeNew();
+
+    node->type  = type;
+    node->left  = left;
+    node->right = right;
+    node->value = val;
+
+    // switch (type)
+    // {
+    //     case TYPE_OP:
+    //         node->value.op = val;
+    //         break;
+    //     case TYPE_VAR:
+    //         node->value.var = val;
+    //         break;
+    //     case TYPE_NUM:
+    //         node->value.num = val;
+    //         break;
+    //     default:
+    // }
+
+    return node;
+}
+

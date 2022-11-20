@@ -26,31 +26,6 @@ Node *NodeNew()
     return res;
 }
 
-Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
-{
-    Node *node = NodeNew();
-
-    node->type  = type;
-    node->left  = left;
-    node->right = right;
-
-    switch (type)
-    {
-        case TYPE_OP:
-            node->value.op = val;
-            break;
-        case TYPE_VAR:
-            node->value.var = val;
-            break;
-        case TYPE_NUM:
-            node->value.num = val;
-            break;
-        default:
-    }
-
-    return node;
-}
-
 Node *TreeCopy(Node *node)
 {
     Node *node_cpy = NodeNew();

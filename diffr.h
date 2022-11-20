@@ -5,7 +5,7 @@
 #include "tree.h"
 #include "stack.h"
 
-#define CREATE_NUM(val) CreateNode (TYPE_NUM, val, NULL, NULL)
+#define CREATE_NUM(val) CreateNode (TYPE_NUM, {.dbl = val}, NULL, NULL)
 
 #define LEFT           (CURR)->left
 #define RIGHT          (CURR)->right
@@ -17,24 +17,25 @@
 #define CP_R           TreeCopy (RIGHT)
 #define CP_CR          TreeCopy (CURR)
 
-#define ADD(lhs, rhs)  CreateNode (TYPE_OP, OP_ADD, lhs,          rhs)
-#define SUB(lhs, rhs)  CreateNode (TYPE_OP, OP_SUB, lhs,          rhs)
+#define ADD(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_ADD}, lhs,          rhs)
+#define SUB(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_SUB}, lhs,          rhs)
 
-#define MUL(lhs, rhs)  CreateNode (TYPE_OP, OP_MUL, lhs,          rhs)
-#define DIV(lhs, rhs)  CreateNode (TYPE_OP, OP_DIV, lhs,          rhs)
+#define MUL(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_MUL}, lhs,          rhs)
+#define DIV(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_DIV}, lhs,          rhs)
 
-#define SIN(rhs)       CreateNode (TYPE_OP, OP_SIN, CreateNum(0), rhs)
-#define COS(rhs)       CreateNode (TYPE_OP, OP_COS, CreateNum(0), rhs)
+#define SIN(rhs)       CreateNode (TYPE_OP, {.op = OP_SIN}, CREATE_NUM(0), rhs)
+#define COS(rhs)       CreateNode (TYPE_OP, {.op = OP_COS}, CREATE_NUM(0), rhs)
 
-#define EXP(lhs, rhs)  CreateNode (TYPE_OP, OP_EXP, lhs,          rhs)
-#define LN(rhs)        CreateNode (TYPE_OP, OP_LN,  CreateNum(0), rhs)
+#define EXP(lhs, rhs)  CreateNode (TYPE_OP, {.op = OP_EXP}, lhs,          rhs)
+#define LN(rhs)        CreateNode (TYPE_OP, {.op = OP_LN},  CREATE_NUM(0), rhs)
 
-#define IS_OP(node, op_code) ((node)->type     == TYPE_OP && \
-                              (node)->value.op == op_code)
+#define IS_OP(node)  ((node)->type == TYPE_OP)
+#define IS_OP_CODE(node, op_code) (IS_OP(node) && \
+                                   (node)->value.op == op_code)
 #define IS_NUM(node) ((node)->type == TYPE_NUM)
 #define IS_VAR(node) ((node)->type == TYPE_VAR)
 
-#define GET_NUM(node) ((node)->value.num)
+#define GET_NUM(node) ((node)->value.dbl)
 
 enum OPTIONS
 {
@@ -61,7 +62,8 @@ enum OP_CODES
     OP_DIV,
     OP_SIN,
     OP_COS,
-    OP_EXP
+    OP_EXP,
+    OP_LN
 };
 
 struct Diffr
@@ -83,6 +85,9 @@ Node       *DiffrParse         (int32_t pos, int32_t *end_pos, TextInfo *text);
 
 void        DiffrDump          (Diffr *diffr);
 void        DiffrDumpToFileDfs (Node *node, int32_t fd, int64_t idx);
+
+Node       *Differentiate      (Node *node);
+Node       *CreateNode         (int32_t type, NodeValue val, Node *left, Node *right);
 
 const char *GetOperatorString  (int32_t op_code);
 #endif  // DIFFR_H
