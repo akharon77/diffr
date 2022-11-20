@@ -231,9 +231,9 @@ Node* Differentiate(Node *node)
                 case OP_EXP:
                     if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                         return CREATE_NUM(0);
-                    else if (IS_NUM(LEFT) && IS_OP(RIGHT))
+                    else if (IS_NUM(LEFT) && IS_FUNC(RIGHT))
                         return MUL(EXP(CP_L, CP_R), MUL(LN(CP_L), D_R));
-                    else if (IS_OP(LEFT) && IS_NUM(RIGHT))
+                    else if (IS_FUNC(LEFT) && IS_NUM(RIGHT))
                         return MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
                     else
                         {

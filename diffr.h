@@ -35,6 +35,8 @@
 #define IS_NUM(node) ((node)->type == TYPE_NUM)
 #define IS_VAR(node) ((node)->type == TYPE_VAR)
 
+#define IS_FUNC(node) (IS_OP(node) || IS_VAR(node))
+
 #define GET_NUM(node) ((node)->value.dbl)
 
 enum OPTIONS
