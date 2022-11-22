@@ -6,11 +6,13 @@
 int main(int argc, const char *argv[])
 {
     const char *str = argv[1];
-    int32_t ans = 0;
+    Node *ans = NodeNew();
 
-    GetGeneral(str, &ans);
+    GetGeneral(str, ans);
 
-    printf("ans = %d\n", ans);
+    DiffrDumpToFileDfs(ans, 1, 0);
+
+    TreeDtor(ans);
     return 0;
 
     int err = 0;

@@ -278,7 +278,7 @@ Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
     return node;
 }
 
-const char *GetGeneral(const char *str, int32_t *value)
+const char *GetGeneral(const char *str, Node *value)
 {
     str = GetExpression(str, value);
 
@@ -288,63 +288,71 @@ const char *GetGeneral(const char *str, int32_t *value)
     return str;
 }
 
-const char *GetExpression(const char *str, int32_t *value)
+const char *GetExpression(const char *str, Node *value)
 {
-    str = GetTerm(str, value);
+    Node *top_node = NodeNew();
+    str = GetTerm(str, top_node);
 
     while (*str == '+' || *str == '-')
     {
         char op = *str;
         ++str;
 
-        int32_t buf_val = 0;
-        str = GetTerm(str, &buf_val);
+        Node *buf_val = NodeNew();
+        str = GetTerm(str, buf_val);
 
         switch (op)
         {
             case '+':
-                *value += buf_val;
+                top_node = ADD(top_node, buf_val);
                 break;
             case '-':
-                *value -= buf_val;
+                top_node = SUB(top_node, buf_val);
                 break;
             default:
                 assert(0 && "Syntax error\n");
         }
     }
 
+    *value = *top_node;
+    free(top_node);
+
     return str;
 }
 
-const char *GetTerm(const char *str, int32_t *value)
+const char *GetTerm(const char *str, Node *value)
 {
-    str = GetPrimary(str, value);
+    Node *top_node = NodeNew();
+    str = GetPrimary(str, top_node);
 
     while (*str == '*' || *str == '/')
     {
         char op = *str;
         ++str;
 
-        int32_t buf_val = 0;
-        str = GetPrimary(str, &buf_val);
+        Node *buf_val = NodeNew();
+        str = GetPrimary(str, buf_val);
 
         switch (op)
         {
             case '*':
-                *value *= buf_val;
+                top_node = MUL(top_node, buf_val);
                 break;
             case '/':
-                *value /= buf_val;
+                top_node = DIV(top_node, buf_val);
                 break;
             default:
                 assert(0 && "Syntax error\n");
         }
     }
 
+    *value = *top_node;
+    free(top_node);
+
     return str;
 }
 
-const char *GetPrimary(const char *str, int32_t *value)
+const char *GetPrimary(const char *str, Node *value)
 {
     if (*str == '(')
     {
@@ -362,7 +370,7 @@ const char *GetPrimary(const char *str, int32_t *value)
     return str;
 }
 
-const char *GetNumber(const char *str, int32_t *value)
+const char *GetNumber(const char *str, Node *value)
 {
     int32_t res = 0;
     const char *str_old = str;
@@ -374,7 +382,10 @@ const char *GetNumber(const char *str, int32_t *value)
     }
 
     assert(str != str_old);
-    *value = res;
+
+    Node *buf_node = CREATE_NUM(res);
+    *value = *buf_node;
+    free(buf_node);
 
     return str;
 }
