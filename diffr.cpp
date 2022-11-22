@@ -237,7 +237,7 @@ Node* Differentiate(Node *node)
                         return MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
                     else
                         {
-                            Node *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));
+                            Node *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));  // TODO: e const
                             Node *res = Differentiate(fict_node);
                             TreeDtor(fict_node);
 
@@ -276,5 +276,106 @@ Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
     // }
 
     return node;
+}
+
+const char *GetGeneral(const char *str, int32_t *value)
+{
+    str = GetExpression(str, value);
+
+    assert(*str == '\0');
+    ++str;
+
+    return str;
+}
+
+const char *GetExpression(const char *str, int32_t *value)
+{
+    str = GetTerm(str, value);
+
+    while (*str == '+' || *str == '-')
+    {
+        char op = *str;
+        ++str;
+
+        int32_t buf_val = 0;
+        str = GetTerm(str, &buf_val);
+
+        switch (op)
+        {
+            case '+':
+                *value += buf_val;
+                break;
+            case '-':
+                *value -= buf_val;
+                break;
+            default:
+                assert(0 && "Syntax error\n");
+        }
+    }
+
+    return str;
+}
+
+const char *GetTerm(const char *str, int32_t *value)
+{
+    str = GetPrimary(str, value);
+
+    while (*str == '*' || *str == '/')
+    {
+        char op = *str;
+        ++str;
+
+        int32_t buf_val = 0;
+        str = GetPrimary(str, &buf_val);
+
+        switch (op)
+        {
+            case '*':
+                *value *= buf_val;
+                break;
+            case '/':
+                *value /= buf_val;
+                break;
+            default:
+                assert(0 && "Syntax error\n");
+        }
+    }
+
+    return str;
+}
+
+const char *GetPrimary(const char *str, int32_t *value)
+{
+    if (*str == '(')
+    {
+        ++str;
+        str = GetExpression(str, value);
+
+        assert(*str == ')');
+        ++str;
+    }
+    else
+    {
+        str = GetNumber(str, value);
+    }
+
+    return str;
+}
+
+const char *GetNumber(const char *str, int32_t *value)
+{
+    int32_t res = 0;
+    const char *str_old = str;
+
+    while ('0' <= *str && *str <= '9')
+    {
+        res = res * 10 + *str - '0';
+        ++str;
+    }
+
+    assert(str != str_old);
+    *value = res;
+
+    return str;
 }
 

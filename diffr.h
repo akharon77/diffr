@@ -92,4 +92,11 @@ Node       *Differentiate      (Node *node);
 Node       *CreateNode         (int32_t type, NodeValue val, Node *left, Node *right);
 
 const char *GetOperatorString  (int32_t op_code);
+
+const char *GetGeneral    (const char *str, int32_t *value);
+const char *GetExpression (const char *str, int32_t *value);
+const char *GetTerm       (const char *str, int32_t *value);
+const char *GetPrimary    (const char *str, int32_t *value);
+const char *GetNumber     (const char *str, int32_t *value);
+
 #endif  // DIFFR_H
