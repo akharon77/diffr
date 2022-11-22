@@ -41,84 +41,14 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
     TextInfoCtor(&text);
 
     InputText(&text, filename, err);
+    InitTextSep(&text);
 
-    int32_t end = 0;
-    diffr->root = DiffrParse(0, &end, &text);
+    diffr->root = NodeNew();
+    GetGeneral(text.base, diffr->root);
+
     diffr->filename = strdup(filename);
 
     TextInfoDtor(&text);
-}
-
-Node *DiffrParse(int32_t pos, int32_t *end_pos, TextInfo *text)
-{
-    Node *node = NodeNew();
-
-    if (text->base[pos + 1] == '(')
-    {
-        int32_t i = 0;
-        NodeAddChild(node, DiffrParse(pos + 1, &i, text));
-        
-        int32_t op_code = 0;
-
-        switch (text->base[++i])
-        {
-            case '+':
-                op_code = OP_ADD;
-                break;
-            case '-':
-                op_code = OP_SUB;
-                break;
-            case '*':
-                op_code = OP_MUL;
-                break;
-            case '/':
-                op_code = OP_DIV;
-                break;
-            case 's':
-                op_code = OP_SIN;
-                break;
-            case 'c':
-                op_code = OP_COS;
-                break;
-            case '^':
-                op_code = OP_EXP;
-                break;
-            case 'l':
-                op_code = OP_LN;
-                break;
-            default:
-                ASSERT(0 && RED "Wrong operator!" NORMAL);
-        }
-
-        node->type     = TYPE_OP;
-        node->value.op = op_code;
-
-        NodeAddChild(node, DiffrParse(i + 1, end_pos, text));
-
-        ++*end_pos;
-    }
-    else if (isalpha(text->base[pos + 1]))
-    {
-        node->type      = TYPE_VAR;
-        node->value.var = text->base[pos + 1];
-
-        *end_pos = pos + 2;
-    }
-    else
-    {
-        node->type = TYPE_NUM;
-        
-        double  num = 0;
-        int32_t offset = 0;
-
-        sscanf(text->base + pos + 1, "%lf)%n", &num, &offset);
-
-        node->value.dbl = num;
-            
-        *end_pos = pos + offset;
-    }
-
-    return node;
 }
 
 void DiffrDump(Diffr *diffr)
@@ -164,7 +94,7 @@ void DiffrDumpToFileDfs(Node *node, int32_t fd, int64_t idx)
             break;
         case TYPE_VAR:
             type_str = "VAR";
-            sprintf(value, "%c", node->value.var);
+            sprintf(value, "%s", node->value.var);
             break;
     }
 
@@ -186,21 +116,21 @@ const char *GetOperatorString(int32_t op_code)
     switch (op_code)
     {
         case OP_ADD:
-            return "{ ADD | + }";
+            return "{ ADD | +   }";
         case OP_SUB:
-            return "{ SUB | - }";
+            return "{ SUB | -   }";
         case OP_MUL:
-            return "{ MUL | * }";
+            return "{ MUL | *   }";
         case OP_DIV:
-            return "{ DIV | / }";
+            return "{ DIV | /   }";
         case OP_SIN:
-            return "{ SIN }";
+            return "{ SIN | sin }";
         case OP_COS:
-            return "{ COS }";
+            return "{ COS | cos }";
         case OP_EXP:
-            return "{ EXP | ^ }";
+            return "{ EXP | ^   }";
         case OP_LN:
-            return "{ LN | l }";
+            return "{ LN  | ln  }";
     }
 
     return "(null)";
@@ -362,9 +292,13 @@ const char *GetPrimary(const char *str, Node *value)
         assert(*str == ')');
         ++str;
     }
-    else
+    else if (isdigit(*str))
     {
         str = GetNumber(str, value);
+    }
+    else
+    {
+        str = GetVariable(str, value);
     }
 
     return str;
@@ -383,10 +317,33 @@ const char *GetNumber(const char *str, Node *value)
 
     assert(str != str_old);
 
-    Node *buf_node = CREATE_NUM(res);
-    *value = *buf_node;
-    free(buf_node);
+    *value = 
+        {
+            .type  = TYPE_NUM,
+            .value = {.dbl = res},
+            .left  = NULL,
+            .right = NULL
+        };
 
     return str;
 }
 
+const char *GetVariable(const char *str, Node *value)
+{
+    const char *str_old = str;
+
+    while (isalpha(*str))
+        ++str;
+
+    assert(str != str_old);
+
+    *value = 
+        {
+            .type  = TYPE_VAR,
+            .value = {.var = strndup(str_old, str - str_old)},
+            .left  = NULL,
+            .right = NULL
+        };
+
+    return str;
+}

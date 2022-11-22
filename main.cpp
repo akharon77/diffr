@@ -5,16 +5,6 @@
 
 int main(int argc, const char *argv[])
 {
-    const char *str = argv[1];
-    Node *ans = NodeNew();
-
-    GetGeneral(str, ans);
-
-    DiffrDumpToFileDfs(ans, 1, 0);
-
-    TreeDtor(ans);
-    return 0;
-
     int err = 0;
 
     int run_mode = HELP_OPTION;

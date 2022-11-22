@@ -5,9 +5,9 @@
 
 typedef union
 {
-    double  dbl;
-    int32_t op;
-    char    var;
+    double      dbl;
+    int32_t     op;
+    const char *var;
 } NodeValue;
 
 struct Node
@@ -15,8 +15,6 @@ struct Node
     int32_t type;
 
     NodeValue value;
-
-    Node *ancstr;
 
     Node *left;
     Node *right;

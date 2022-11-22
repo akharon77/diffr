@@ -98,5 +98,6 @@ const char *GetExpression (const char *str, Node *value);
 const char *GetTerm       (const char *str, Node *value);
 const char *GetPrimary    (const char *str, Node *value);
 const char *GetNumber     (const char *str, Node *value);
+const char *GetVariable   (const char *str, Node *value);
 
 #endif  // DIFFR_H

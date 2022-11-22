@@ -46,8 +46,6 @@ void NodeAddChild(Node *node, Node *child)
         node->left  = child;
     else
         node->right = child;
-
-    child->ancstr = node;
 }
 
 bool NodeIsLeaf(Node *node)
