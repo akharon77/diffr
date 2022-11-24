@@ -333,17 +333,24 @@ const char *GetVariable(const char *str, Node *value)
 
 #define CURR node
 
+void Simplify(Node *node)
+{
+    if (!NodeIsLeaf(CURR))
+    {
+        Simplify (LEFT);
+        Simplify (RIGHT);
+    }
+
+    RotateCommutative (CURR);
+    SimplifyConst     (CURR);
+    SimplifyNeutral   (CURR);
+}
+
 void SimplifyConst(Node *node)
 {
     if (IS_VAR(node) || IS_NUM(node))
         return;
     
-    if (!NodeIsLeaf(node))
-    {
-        SimplifyConst(node->left);
-        SimplifyConst(node->right);
-    }
-
     if (IS_NUM(node->left) && IS_NUM(node->right))
     {
         node->type = TYPE_NUM;
@@ -382,6 +389,88 @@ void SimplifyConst(Node *node)
         RIGHT = NULL;
     }
 
+}
+
+void SimplifyNeutral(Node *node)
+{
+    if (IS_NUM(node) || IS_VAR(node))
+        return;
+
+    switch (node->value.op)
+    {
+        case OP_ADD:
+            if (IS_ZERO(LEFT))
+            {
+                free(LEFT);
+
+                Node *last_right =  RIGHT;
+                     *node       = *RIGHT;
+
+                free(last_right);
+            }
+            break;
+        case OP_MUL:
+            if (IS_ZERO(LEFT))
+            {
+                free(LEFT);
+                TreeDtor(RIGHT);
+
+                NUM_CTOR(node, 0);
+            }
+            else if (IS_ONE(LEFT))
+            {
+                free(LEFT);
+
+                Node *last_right =  RIGHT;
+                     *CURR       = *RIGHT;
+
+                free(last_right);
+            }
+            break;
+        case OP_DIV:
+            if (IS_ZERO(LEFT))
+            {
+                free(LEFT);
+                TreeDtor(RIGHT);
+
+                NUM_CTOR(CURR, 0);
+            }
+            else if (IS_ONE(RIGHT))
+            {
+                free(RIGHT);
+
+                Node *last_left =  LEFT;
+                     *CURR      = *LEFT;
+
+                free(last_left);
+            }
+            break;
+        case OP_EXP:
+            if (IS_ZERO(LEFT))
+            {
+                free(LEFT);
+                TreeDtor(RIGHT);
+
+                NUM_CTOR(CURR, 0);
+            }
+            else if (IS_ONE(RIGHT))
+            {
+                free(LEFT);
+                TreeDtor(RIGHT);
+
+                NUM_CTOR(CURR, 1);
+            }
+    }
+}
+
+void RotateCommutative(Node *node)
+{
+    if ((IS_OP_CODE(CURR, OP_ADD) || IS_OP_CODE(CURR, OP_MUL)) && IS_NUM(RIGHT))
+    {
+        Node *buf   = LEFT;
+              LEFT  = RIGHT;
+              RIGHT = buf;
+    }
 }
 
 #undef CURR
