@@ -26,9 +26,10 @@ int main(int argc, const char *argv[])
     DiffrDump(&diffr);
 
     Diffr df = {};
-    df.root = Differentiate(diffr.root);
+    SimplifyConst(diffr.root);
+    //df.root = Differentiate(diffr.root);
     df.filename = "df.txt";
-    DiffrDump(&df);
+    DiffrDump(&diffr);
     
     return 0;
 }

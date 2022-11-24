@@ -5,7 +5,7 @@
 #include "tree.h"
 #include "stack.h"
 
-#define CREATE_NUM(val) CreateNode (TYPE_NUM, {.dbl = val}, NULL, NULL)
+#define CREATE_NUM(val)       CreateNode (TYPE_NUM, {.dbl = val}, NULL, NULL)
 
 #define LEFT           (CURR)->left
 #define RIGHT          (CURR)->right
@@ -89,6 +89,7 @@ void        DiffrDump          (Diffr *diffr);
 void        DiffrDumpToFileDfs (Node *node, int32_t fd, int64_t idx);
 
 Node       *Differentiate      (Node *node);
+void        SimplifyConst      (Node *node);
 Node       *CreateNode         (int32_t type, NodeValue val, Node *left, Node *right);
 
 const char *GetOperatorString  (int32_t op_code);

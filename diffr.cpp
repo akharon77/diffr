@@ -186,24 +186,7 @@ Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
 {
     Node *node = NodeNew();
 
-    node->type  = type;
-    node->left  = left;
-    node->right = right;
-    node->value = val;
-
-    // switch (type)
-    // {
-    //     case TYPE_OP:
-    //         node->value.op = val;
-    //         break;
-    //     case TYPE_VAR:
-    //         node->value.var = val;
-    //         break;
-    //     case TYPE_NUM:
-    //         node->value.num = val;
-    //         break;
-    //     default:
-    // }
+    NodeCtor(node, type, val, left, right);
 
     return node;
 }
@@ -347,3 +330,58 @@ const char *GetVariable(const char *str, Node *value)
 
     return str;
 }
+
+#define CURR node
+
+void SimplifyConst(Node *node)
+{
+    if (IS_VAR(node) || IS_NUM(node))
+        return;
+    
+    if (!NodeIsLeaf(node))
+    {
+        SimplifyConst(node->left);
+        SimplifyConst(node->right);
+    }
+
+    if (IS_NUM(node->left) && IS_NUM(node->right))
+    {
+        node->type = TYPE_NUM;
+
+        switch (node->value.op)
+        {
+            case OP_ADD:
+                node->value = {.dbl = GET_NUM(LEFT) + GET_NUM(RIGHT)};
+                break;
+            case OP_SUB:
+                node->value = {.dbl = GET_NUM(LEFT) - GET_NUM(RIGHT)};
+                break;
+            case OP_MUL:
+                node->value = {.dbl = GET_NUM(LEFT) / GET_NUM(RIGHT)};
+                break;
+            case OP_DIV:
+                node->value = {.dbl = GET_NUM(LEFT) * GET_NUM(RIGHT)};
+                break;
+            case OP_SIN:
+                node->value = {.dbl = sin(GET_NUM(RIGHT))};
+                break;
+            case OP_COS:
+                node->value = {.dbl = cos(GET_NUM(RIGHT))};
+            case OP_EXP:
+                node->value = {.dbl = pow(GET_NUM(LEFT), GET_NUM(RIGHT))};
+                break;
+            case OP_LN:
+                node->value = {.dbl = log(GET_NUM(RIGHT))};
+                break;
+        }
+        
+        free(LEFT);
+        free(RIGHT);
+
+        LEFT  = NULL;
+        RIGHT = NULL;
+    }
+
+}
+
+#undef CURR

@@ -53,3 +53,13 @@ bool NodeIsLeaf(Node *node)
     return node->left == NULL && node->right == NULL;
 }
 
+void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node *right)
+{
+    *node = 
+        {
+            .type  = type,
+            .value = value,
+            .left  = left,
+            .right = right 
+        };
+}

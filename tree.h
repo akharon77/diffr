@@ -23,6 +23,7 @@ struct Node
 void   TreeCtor     (Node *tree);
 void   TreeDtor     (Node *tree);
 
+void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node *right);
 Node  *NodeNew      ();
 void   NodeAddChild (Node *node, Node *child);
 Node  *TreeCopy     (Node *node);
