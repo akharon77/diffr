@@ -37,6 +37,16 @@ void DiffrDtor(Diffr *diffr)
     free(diffr->filename);
 }
 
+void DiffrRun(Diffr *diffr)
+{
+    TreeNode *df_node = Differentiate(diffr->root);
+
+    TreeDtor(diffr->root);
+    diffr->root = df_node;
+
+    Simplify(diffr->root);
+}
+
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
 {
     TextInfo text = {};
@@ -45,7 +55,7 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
     InputText(&text, filename, err);
     InitTextSep(&text);
 
-    diffr->root = NodeNew();
+    diffr->root = TreeNodeNew();
     GetGeneral(text.base, diffr->root);
 
     diffr->filename = strdup(filename);
@@ -69,7 +79,7 @@ void DiffrDump(Diffr *diffr)
     ASSERT(fd != -1);
 
     dprintf(fd, "digraph G {\n");
-    DiffrDumpToFileDfs(diffr->root, fd, 0);
+    DumpToFile(diffr->root, fd, 0);
     dprintf(fd, "}\n");
 
     close(fd);
@@ -79,71 +89,46 @@ void DiffrDump(Diffr *diffr)
     system(cmd);
 }
 
-void DiffrDumpToFileDfs(Node *node, int32_t fd, int64_t idx)
+#define CURR node
+
+void DumpToFile(TreeNode *node, int32_t fd, int64_t idx)
 {
     const char *type_str   = "";
           char  value[256] = "";
 
-    switch (node->type)
+    switch (GET_TYPE(CURR))
     {
         case TYPE_OP:
             type_str = "OP";
-            sprintf(value, "%s", GetOperatorString(node->value.op));
+            sprintf(value, "%s", GetOperatorString(GET_OP(CURR)));
             break;
         case TYPE_NUM:
             type_str = "NUM";
-            sprintf(value, "%lf", node->value.dbl);
+            sprintf(value, "%lf", GET_NUM(CURR));
             break;
         case TYPE_VAR:
             type_str = "VAR";
-            sprintf(value, "%s", node->value.var);
+            sprintf(value, "%s", GET_VAR(CURR));
             break;
     }
 
     dprintf(fd, "node%ld[shape=record, label=\" { %s | %s } \"];\n",
                 idx, type_str, value);
 
-    if (node->left != NULL)
+    if (LEFT)
     {
         dprintf(fd, "node%ld->node%ld;", idx, 2 * idx + 1);
-        DiffrDumpToFileDfs(node->left,  fd, 2 * idx + 1);
+        DumpToFile(LEFT,  fd, 2 * idx + 1);
     }
 
-    if (node->right != NULL)
+    if (RIGHT)
     {
         dprintf(fd, "node%ld->node%ld;", idx, 2 * idx + 2);
-        DiffrDumpToFileDfs(node->right, fd, 2 * idx + 2);
+        DumpToFile(RIGHT, fd, 2 * idx + 2);
     }
 }
 
-const char *GetOperatorString(int32_t op_code)
-{
-    switch (op_code)
-    {
-        case OP_ADD:
-            return "{ ADD | +   }";
-        case OP_SUB:
-            return "{ SUB | -   }";
-        case OP_MUL:
-            return "{ MUL | *   }";
-        case OP_DIV:
-            return "{ DIV | /   }";
-        case OP_SIN:
-            return "{ SIN | sin }";
-        case OP_COS:
-            return "{ COS | cos }";
-        case OP_EXP:
-            return "{ EXP | ^   }";
-        case OP_LN:
-            return "{ LN  | ln  }";
-    }
-
-    return "(null)";
-}
-
-#define CURR node
-
-Node* Differentiate(Node *node)
+TreeNode* Differentiate(TreeNode *node)
 {
     ASSERT(node != NULL);
 
@@ -172,8 +157,8 @@ Node* Differentiate(Node *node)
                         return MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
                     else
                         {
-                            Node *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));  // TODO: e const
-                            Node *res = Differentiate(fict_node);
+                            TreeNode *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));  // TODO: e const
+                            TreeNode *res = Differentiate(fict_node);
                             TreeDtor(fict_node);
 
                             return res;
@@ -185,16 +170,32 @@ Node* Differentiate(Node *node)
     }
 }
 
-Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
+const char *GetOperatorString(int32_t op_code)
 {
-    Node *node = NodeNew();
+    switch (op_code)
+    {
+        case OP_ADD:
+            return "{ ADD | +   }";
+        case OP_SUB:
+            return "{ SUB | -   }";
+        case OP_MUL:
+            return "{ MUL | *   }";
+        case OP_DIV:
+            return "{ DIV | /   }";
+        case OP_SIN:
+            return "{ SIN | sin }";
+        case OP_COS:
+            return "{ COS | cos }";
+        case OP_EXP:
+            return "{ EXP | ^   }";
+        case OP_LN:
+            return "{ LN  | ln  }";
+    }
 
-    NodeCtor(node, type, val, left, right);
-
-    return node;
+    return "(null)";
 }
 
-void Simplify(Node *node)
+void Simplify(TreeNode *node)
 {
     if (LEFT)
         Simplify (LEFT);
@@ -207,7 +208,7 @@ void Simplify(Node *node)
     SimplifyNeutral   (CURR);
 }
 
-void SimplifyConst(Node *node)
+void SimplifyConst(TreeNode *node)
 {
     if (IS_VAR(node) || IS_NUM(node))
         return;
@@ -232,7 +233,7 @@ void SimplifyConst(Node *node)
                          IS_OP_CODE(RIGHT, OP_SUB)) && 
                          IS_NUM(RIGHT->left))
                 {
-                    Node *last_right = RIGHT;
+                    TreeNode *last_right = RIGHT;
                     GET_NUM(LEFT) = GET_NUM(LEFT) + GET_NUM(RIGHT->left);
                     GET_OP(CURR)  = GET_OP(RIGHT);
 
@@ -261,7 +262,7 @@ void SimplifyConst(Node *node)
                          IS_OP_CODE(RIGHT, OP_SUB)) && 
                          IS_NUM(RIGHT->left))
                 {
-                    Node *last_right = RIGHT;
+                    TreeNode *last_right = RIGHT;
                     GET_NUM(LEFT) = GET_NUM(LEFT) - GET_NUM(RIGHT->left);
                     GET_OP(CURR) = IS_OP_CODE(RIGHT, OP_ADD) ? OP_SUB : OP_ADD;
 
@@ -288,7 +289,7 @@ void SimplifyConst(Node *node)
                      IS_OP_CODE(RIGHT, OP_MUL) &&
                      IS_NUM(RIGHT->left))
             {
-                Node *last_right = RIGHT;
+                TreeNode *last_right = RIGHT;
                 GET_NUM(LEFT) = GET_NUM(LEFT) * GET_NUM(RIGHT->left);
 
                 free(RIGHT->left);
@@ -358,7 +359,7 @@ void SimplifyConst(Node *node)
     }
 }
 
-void SimplifyNeutral(Node *node)
+void SimplifyNeutral(TreeNode *node)
 {
     if (IS_NUM(node) || IS_VAR(node))
         return;
@@ -370,7 +371,7 @@ void SimplifyNeutral(Node *node)
             {
                 free(LEFT);
 
-                Node *last_right =  RIGHT;
+                TreeNode *last_right =  RIGHT;
                      *node       = *RIGHT;
 
                 free(last_right);
@@ -388,7 +389,7 @@ void SimplifyNeutral(Node *node)
             {
                 free(LEFT);
 
-                Node *last_right =  RIGHT;
+                TreeNode *last_right =  RIGHT;
                      *CURR       = *RIGHT;
 
                 free(last_right);
@@ -406,7 +407,7 @@ void SimplifyNeutral(Node *node)
             {
                 free(RIGHT);
 
-                Node *last_left =  LEFT;
+                TreeNode *last_left =  LEFT;
                      *CURR      = *LEFT;
 
                 free(last_left);
@@ -431,7 +432,7 @@ void SimplifyNeutral(Node *node)
             {
                 free(RIGHT);
 
-                Node *last_left =  LEFT;
+                TreeNode *last_left =  LEFT;
                      *CURR      = *LEFT;
                 
                 free(last_left);
@@ -439,11 +440,11 @@ void SimplifyNeutral(Node *node)
     }
 }
 
-void RotateCommutative(Node *node)
+void RotateCommutative(TreeNode *node)
 {
     if ((IS_OP_CODE(CURR, OP_ADD) || IS_OP_CODE(CURR, OP_MUL)) && IS_NUM(RIGHT))
     {
-        Node *buf   = LEFT;
+        TreeNode *buf   = LEFT;
               LEFT  = RIGHT;
               RIGHT = buf;
     }

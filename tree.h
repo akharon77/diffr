@@ -8,26 +8,27 @@ typedef union
     double      dbl;
     int32_t     op;
     const char *var;
-} NodeValue;
+} TreeNodeValue;
 
-struct Node
+struct TreeNode
 {
     int32_t type;
 
-    NodeValue value;
+    TreeNodeValue value;
 
-    Node *left;
-    Node *right;
+    TreeNode *left;
+    TreeNode *right;
 };
 
-void   TreeCtor     (Node *node);
-void   TreeDtor     (Node *node);
+void   TreeCtor     (TreeNode *node);
+void   TreeDtor     (TreeNode *node);
 
-void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node *right);
-Node  *NodeNew      ();
-void   NodeAddChild (Node *node, Node *child);
-Node  *TreeCopy     (Node *node);
+void   TreeNodeCtor     (TreeNode *node, int32_t type, TreeNodeValue value, TreeNode *left, TreeNode *right);
+TreeNode  *CreateTreeNode   (int32_t type, TreeNodeValue val, TreeNode *left, TreeNode *right);
+TreeNode  *TreeNodeNew      ();
+void   TreeNodeAddChild (TreeNode *node, TreeNode *child);
+TreeNode  *TreeCopy     (TreeNode *node);
 
-bool   NodeIsLeaf   (Node *node);
+bool   TreeNodeIsLeaf   (TreeNode *node);
 
 #endif  // TREE_H

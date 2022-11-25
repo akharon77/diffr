@@ -30,16 +30,13 @@ int main(int argc, const char *argv[])
 
     Diffr diffr = {};
 
-    diffr.filename = "test.txt";
     DiffrInput(&diffr, "test.txt", &err);
     DiffrDump(&diffr);
 
-    Diffr df = {};
-    df.filename = "df.txt";
-    df.root = Differentiate(diffr.root);
-    DiffrDump(&df);
-    Simplify(df.root);
-    DiffrDump(&df);
+    DiffrRun(&diffr);
+    DiffrDump(&diffr);
     
+    DiffrDtor(&diffr);
+
     return 0;
 }

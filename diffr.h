@@ -18,9 +18,9 @@ enum OPTIONS
 
 enum NODE_TYPES
 {
-    TYPE_OP,
-    TYPE_NUM,
-    TYPE_VAR
+    NODE_TYPE_OP,
+    NODE_TYPE_NUM,
+    NODE_TYPE_VAR
 };
 
 enum OP_CODES
@@ -39,7 +39,7 @@ struct Diffr
 {
     char *filename;
 
-    Node *root;
+    TreeNode *root;
 };
 
 extern const Option       EXEC_OPTIONS[];
@@ -47,23 +47,26 @@ extern const size_t       N_EXEC_OPTIONS;
 
 const int32_t MAX_STR_OBJ_LEN = 128;
 
-void        DiffrCtor          (Diffr *diffr);
+void        DiffrCtor         (Diffr *diffr);
+void        DiffrDtor         (Diffr *diffr);
 
-void        DiffrInput         (Diffr *diffr, const char *filename, int32_t *err);
-Node       *DiffrParse         (int32_t pos, int32_t *end_pos, TextInfo *text);
+void        DiffrRun          (Diffr *diffr);
 
-void        DiffrDump          (Diffr *diffr);
-void        DiffrDumpToFileDfs (Node *node, int32_t fd, int64_t idx);
+void        DiffrInput        (Diffr *diffr, const char *filename, int32_t *err);
+TreeNode       *DiffrParse        (int32_t pos, int32_t *end_pos, TextInfo *text);
 
-Node       *Differentiate      (Node *node);
+void        DiffrDump         (Diffr *diffr);
+void        DumpToFile        (TreeNode *node, int32_t fd, int64_t idx);
 
-void        Simplify           (Node *node);
-void        SimplifyConst      (Node *node);
-void        SimplifyNeutral    (Node *node);
-void        RotateCommutative  (Node *node);
+TreeNode       *Differentiate     (TreeNode *node);
 
-Node       *CreateNode         (int32_t type, NodeValue val, Node *left, Node *right);
+void        Simplify          (TreeNode *node);
 
-const char *GetOperatorString  (int32_t op_code);
+void        SimplifyConst     (TreeNode *node);
+void        SimplifyNeutral   (TreeNode *node);
+
+void        RotateCommutative (TreeNode *node);
+
+const char *GetOperatorString (int32_t op_code);
 
 #endif  // DIFFR_H

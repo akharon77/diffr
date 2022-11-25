@@ -74,3 +74,12 @@ void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node
         };
 }
 
+Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
+{
+    Node *node = NodeNew();
+
+    NodeCtor(node, type, val, left, right);
+
+    return node;
+}
+
