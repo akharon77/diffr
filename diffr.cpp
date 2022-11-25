@@ -416,6 +416,7 @@ void SimplifyConst(Node *node)
                 if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                 {
                     GET_NUM(CURR) = GET_NUM(LEFT) + GET_NUM(RIGHT);
+                    GET_TYPE(CURR) = TYPE_NUM;
                     
                     free(LEFT);
                     LEFT = NULL;
@@ -444,6 +445,7 @@ void SimplifyConst(Node *node)
                 if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                 {
                     GET_NUM(CURR) = GET_NUM(LEFT) - GET_NUM(RIGHT);
+                    GET_TYPE(CURR) = TYPE_NUM;
 
                     free(LEFT);
                     LEFT = NULL;
@@ -471,6 +473,7 @@ void SimplifyConst(Node *node)
             if (IS_NUM(LEFT) && IS_NUM(RIGHT))
             {
                 GET_NUM(CURR) = GET_NUM(LEFT) * GET_NUM(RIGHT);
+                GET_TYPE(CURR) = TYPE_NUM;
 
                 free(LEFT);
                 LEFT = NULL;
@@ -495,6 +498,7 @@ void SimplifyConst(Node *node)
             if (IS_NUM(LEFT) && IS_NUM(RIGHT))
             {
                 GET_NUM(CURR) = GET_NUM(LEFT) / GET_NUM(RIGHT);
+                GET_TYPE(CURR) = TYPE_NUM;
 
                 free(LEFT);
                 LEFT = NULL;
@@ -507,6 +511,7 @@ void SimplifyConst(Node *node)
             if (IS_NUM(RIGHT))
             {
                 GET_NUM(CURR) = sin(GET_NUM(RIGHT));
+                GET_TYPE(CURR) = TYPE_NUM;
 
                 free(RIGHT);
                 RIGHT = NULL;
@@ -516,6 +521,7 @@ void SimplifyConst(Node *node)
             if (IS_NUM(RIGHT))
             {
                 GET_NUM(CURR) = cos(GET_NUM(RIGHT));
+                GET_TYPE(CURR) = TYPE_NUM;
 
                 free(RIGHT);
                 RIGHT = NULL;
@@ -525,6 +531,7 @@ void SimplifyConst(Node *node)
             if (IS_NUM(LEFT) && IS_NUM(RIGHT))
             {
                 GET_NUM(CURR) = pow(GET_NUM(LEFT), GET_NUM(RIGHT));
+                GET_TYPE(CURR) = TYPE_NUM;
 
                 free(LEFT);
                 LEFT = NULL;
@@ -537,6 +544,7 @@ void SimplifyConst(Node *node)
             if (IS_NUM(RIGHT))
             {
                 GET_NUM(CURR) = log(GET_NUM(RIGHT));
+                GET_TYPE(CURR) = TYPE_NUM;
 
                 free(RIGHT);
                 RIGHT = NULL;
