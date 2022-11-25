@@ -388,17 +388,55 @@ void SimplifyConst(Node *node)
     if (IS_VAR(node) || IS_NUM(node))
         return;
     
-    if (IS_NUM(node->left) && IS_NUM(node->right))
+    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
     {
         node->type = TYPE_NUM;
 
         switch (node->value.op)
         {
             case OP_ADD:
-                node->value = {.dbl = GET_NUM(LEFT) + GET_NUM(RIGHT)};
+                {
+                    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+                    {
+                        GET_NUM(CURR) = GET_NUM(LEFT) + GET_NUM(RIGHT);
+                    }
+                    else if (IS_NUM(LEFT)               && 
+                            (IS_OP_CODE(RIGHT, OP_ADD)  ||
+                             IS_OP_CODE(RIGHT, OP_SUB)) && 
+                             IS_NUM(RIGHT->left))
+                    {
+                        Node *last_right = RIGHT;
+                        GET_NUM(LEFT) = GET_NUM(LEFT) + GET_NUM(RIGHT->left);
+                        GET_OP(CURR)  = GET_OP(RIGHT);
+
+                        free(RIGHT->left);
+                        RIGHT = RIGHT->right;
+
+                        free(last_right);
+                    }
+                }
                 break;
             case OP_SUB:
-                node->value = {.dbl = GET_NUM(LEFT) - GET_NUM(RIGHT)};
+                {
+                    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+                    {
+                        GET_NUM(CURR) = GET_NUM(LEFT) - GET_NUM(RIGHT);
+                    }
+                    else if (IS_NUM(LEFT)               && 
+                            (IS_OP_CODE(RIGHT, OP_ADD)  ||
+                             IS_OP_CODE(RIGHT, OP_SUB)) && 
+                             IS_NUM(RIGHT->left))
+                    {
+                        Node *last_right = RIGHT;
+                        GET_NUM(LEFT) = GET_NUM(LEFT) - GET_NUM(RIGHT->left);
+                        GET_OP(CURR) = IS_OP_CODE(RIGHT, OP_ADD) ? OP_SUB : OP_ADD;
+
+                        free(RIGHT->left);
+                        RIGHT = RIGHT->right;
+
+                        free(last_right);
+                    }
+                }
                 break;
             case OP_MUL:
                 node->value = {.dbl = GET_NUM(LEFT) * GET_NUM(RIGHT)};

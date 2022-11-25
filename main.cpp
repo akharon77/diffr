@@ -5,6 +5,13 @@
 
 int main(int argc, const char *argv[])
 {
+    Node *root = NodeNew();
+    GetExpression("2-2-x", root);
+    Simplify(root);
+    DiffrDumpToFileDfs(root, 1, 0);
+
+    return 0;
+
     int err = 0;
 
     int run_mode = HELP_OPTION;
