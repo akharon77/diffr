@@ -388,82 +388,142 @@ void SimplifyConst(Node *node)
     if (IS_VAR(node) || IS_NUM(node))
         return;
     
-    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+    switch (node->value.op)
     {
-        node->type = TYPE_NUM;
-
-        switch (node->value.op)
-        {
-            case OP_ADD:
+        case OP_ADD:
+            {
+                if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                 {
-                    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
-                    {
-                        GET_NUM(CURR) = GET_NUM(LEFT) + GET_NUM(RIGHT);
-                    }
-                    else if (IS_NUM(LEFT)               && 
-                            (IS_OP_CODE(RIGHT, OP_ADD)  ||
-                             IS_OP_CODE(RIGHT, OP_SUB)) && 
-                             IS_NUM(RIGHT->left))
-                    {
-                        Node *last_right = RIGHT;
-                        GET_NUM(LEFT) = GET_NUM(LEFT) + GET_NUM(RIGHT->left);
-                        GET_OP(CURR)  = GET_OP(RIGHT);
+                    GET_NUM(CURR) = GET_NUM(LEFT) + GET_NUM(RIGHT);
+                    
+                    free(LEFT);
+                    LEFT = NULL;
 
-                        free(RIGHT->left);
-                        RIGHT = RIGHT->right;
-
-                        free(last_right);
-                    }
+                    free(RIGHT);
+                    RIGHT = NULL;
                 }
-                break;
-            case OP_SUB:
+                else if (IS_NUM(LEFT)               && 
+                        (IS_OP_CODE(RIGHT, OP_ADD)  ||
+                         IS_OP_CODE(RIGHT, OP_SUB)) && 
+                         IS_NUM(RIGHT->left))
                 {
-                    if (IS_NUM(LEFT) && IS_NUM(RIGHT))
-                    {
-                        GET_NUM(CURR) = GET_NUM(LEFT) - GET_NUM(RIGHT);
-                    }
-                    else if (IS_NUM(LEFT)               && 
-                            (IS_OP_CODE(RIGHT, OP_ADD)  ||
-                             IS_OP_CODE(RIGHT, OP_SUB)) && 
-                             IS_NUM(RIGHT->left))
-                    {
-                        Node *last_right = RIGHT;
-                        GET_NUM(LEFT) = GET_NUM(LEFT) - GET_NUM(RIGHT->left);
-                        GET_OP(CURR) = IS_OP_CODE(RIGHT, OP_ADD) ? OP_SUB : OP_ADD;
+                    Node *last_right = RIGHT;
+                    GET_NUM(LEFT) = GET_NUM(LEFT) + GET_NUM(RIGHT->left);
+                    GET_OP(CURR)  = GET_OP(RIGHT);
 
-                        free(RIGHT->left);
-                        RIGHT = RIGHT->right;
+                    free(RIGHT->left);
+                    RIGHT = RIGHT->right;
 
-                        free(last_right);
-                    }
+                    free(last_right);
                 }
-                break;
-            case OP_MUL:
-                node->value = {.dbl = GET_NUM(LEFT) * GET_NUM(RIGHT)};
-                break;
-            case OP_DIV:
-                node->value = {.dbl = GET_NUM(LEFT) / GET_NUM(RIGHT)};
-                break;
-            case OP_SIN:
-                node->value = {.dbl = sin(GET_NUM(RIGHT))};
-                break;
-            case OP_COS:
-                node->value = {.dbl = cos(GET_NUM(RIGHT))};
-            case OP_EXP:
-                node->value = {.dbl = pow(GET_NUM(LEFT), GET_NUM(RIGHT))};
-                break;
-            case OP_LN:
-                node->value = {.dbl = log(GET_NUM(RIGHT))};
-                break;
-        }
-        
-        free(LEFT);
-        free(RIGHT);
+            }
+            break;
+        case OP_SUB:
+            {
+                if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+                {
+                    GET_NUM(CURR) = GET_NUM(LEFT) - GET_NUM(RIGHT);
 
-        LEFT  = NULL;
-        RIGHT = NULL;
+                    free(LEFT);
+                    LEFT = NULL;
+
+                    free(RIGHT);
+                    RIGHT = NULL;
+                }
+                else if (IS_NUM(LEFT)               && 
+                        (IS_OP_CODE(RIGHT, OP_ADD)  ||
+                         IS_OP_CODE(RIGHT, OP_SUB)) && 
+                         IS_NUM(RIGHT->left))
+                {
+                    Node *last_right = RIGHT;
+                    GET_NUM(LEFT) = GET_NUM(LEFT) - GET_NUM(RIGHT->left);
+                    GET_OP(CURR) = IS_OP_CODE(RIGHT, OP_ADD) ? OP_SUB : OP_ADD;
+
+                    free(RIGHT->left);
+                    RIGHT = RIGHT->right;
+
+                    free(last_right);
+                }
+            }
+            break;
+        case OP_MUL:
+            if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+            {
+                GET_NUM(CURR) = GET_NUM(LEFT) * GET_NUM(RIGHT);
+
+                free(LEFT);
+                LEFT = NULL;
+
+                free(RIGHT);
+                RIGHT = NULL;
+            }
+            else if (IS_NUM(LEFT)              &&
+                     IS_OP_CODE(RIGHT, OP_MUL) &&
+                     IS_NUM(RIGHT->left))
+            {
+                Node *last_right = RIGHT;
+                GET_NUM(LEFT) = GET_NUM(LEFT) * GET_NUM(RIGHT->left);
+
+                free(RIGHT->left);
+                RIGHT = RIGHT->right;
+
+                free(last_right);
+            }
+            break;
+        case OP_DIV:
+            if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+            {
+                GET_NUM(CURR) = GET_NUM(LEFT) / GET_NUM(RIGHT);
+
+                free(LEFT);
+                LEFT = NULL;
+
+                free(RIGHT);
+                RIGHT = NULL;
+            }
+            break;
+        case OP_SIN:
+            if (IS_NUM(RIGHT))
+            {
+                GET_NUM(CURR) = sin(GET_NUM(RIGHT));
+
+                free(RIGHT);
+                RIGHT = NULL;
+            }
+            break;
+        case OP_COS:
+            if (IS_NUM(RIGHT))
+            {
+                GET_NUM(CURR) = cos(GET_NUM(RIGHT));
+
+                free(RIGHT);
+                RIGHT = NULL;
+            }
+            break;
+        case OP_EXP:
+            if (IS_NUM(LEFT) && IS_NUM(RIGHT))
+            {
+                GET_NUM(CURR) = pow(GET_NUM(LEFT), GET_NUM(RIGHT));
+
+                free(LEFT);
+                LEFT = NULL;
+
+                free(RIGHT);
+                RIGHT = NULL;
+            }
+            break;
+        case OP_LN:
+            if (IS_NUM(RIGHT))
+            {
+                GET_NUM(CURR) = log(GET_NUM(RIGHT));
+
+                free(RIGHT);
+                RIGHT = NULL;
+            }
+            break;
+        default:
+            assert(0 && "Wrong operation");
     }
-
 }
 
 void SimplifyNeutral(Node *node)

@@ -6,7 +6,9 @@
 int main(int argc, const char *argv[])
 {
     Node *root = NodeNew();
-    GetExpression("2-2-x", root);
+    GetExpression("2*(2*x)", root);
+    DiffrDumpToFileDfs(root, 1, 0);
+    printf("\n");
     Simplify(root);
     DiffrDumpToFileDfs(root, 1, 0);
 
