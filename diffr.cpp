@@ -336,17 +336,17 @@ const char *GetFunction(const char *str, Node *value)
 {
     int32_t op = 0;
 
-    if (strncmp(str, "sin", 3))
+    if (strncmp(str, "sin", 3) == 0)
     {
         op = OP_SIN;
         str += 3;
     }
-    else if (strncmp(str, "cos", 3))
+    else if (strncmp(str, "cos", 3) == 0)
     {
         op = OP_COS;
         str += 3;
     }
-    else if (strncmp(str, "ln", 2))
+    else if (strncmp(str, "ln", 2) == 0)
     {
         op = OP_LN;
         str += 2;
