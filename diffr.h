@@ -111,7 +111,8 @@ const char *GetOperatorString  (int32_t op_code);
 
 const char *GetGeneral    (const char *str, Node *value);
 const char *GetExpression (const char *str, Node *value);
-const char *GetTerm       (const char *str, Node *value);
+const char *GetProduct    (const char *str, Node *value);
+const char *GetPower      (const char *str, Node *value);
 const char *GetPrimary    (const char *str, Node *value);
 const char *GetNumber     (const char *str, Node *value);
 const char *GetVariable   (const char *str, Node *value);

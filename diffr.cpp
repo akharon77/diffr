@@ -207,7 +207,7 @@ const char *GetGeneral(const char *str, Node *value)
 const char *GetExpression(const char *str, Node *value)
 {
     Node *top_node = NodeNew();
-    str = GetTerm(str, top_node);
+    str = GetProduct(str, top_node);
 
     while (*str == '+' || *str == '-')
     {
@@ -215,7 +215,7 @@ const char *GetExpression(const char *str, Node *value)
         ++str;
 
         Node *buf_val = NodeNew();
-        str = GetTerm(str, buf_val);
+        str = GetProduct(str, buf_val);
 
         switch (op)
         {
@@ -236,10 +236,10 @@ const char *GetExpression(const char *str, Node *value)
     return str;
 }
 
-const char *GetTerm(const char *str, Node *value)
+const char *GetProduct(const char *str, Node *value)
 {
     Node *top_node = NodeNew();
-    str = GetPrimary(str, top_node);
+    str = GetPower(str, top_node);
 
     while (*str == '*' || *str == '/')
     {
@@ -247,7 +247,7 @@ const char *GetTerm(const char *str, Node *value)
         ++str;
 
         Node *buf_val = NodeNew();
-        str = GetPrimary(str, buf_val);
+        str = GetPower(str, buf_val);
 
         switch (op)
         {
@@ -260,6 +260,27 @@ const char *GetTerm(const char *str, Node *value)
             default:
                 assert(0 && "Syntax error\n");
         }
+    }
+
+    *value = *top_node;
+    free(top_node);
+
+    return str;
+}
+
+const char *GetPower(const char *str, Node *value)
+{
+    Node *top_node = NodeNew();
+    str = GetPrimary(str, top_node);
+
+    while (*str == '^')
+    {
+        Node *buf_val = NodeNew();
+
+        ++str;
+        str = GetPrimary(str, buf_val);
+
+        top_node = EXP(top_node, buf_val);
     }
 
     *value = *top_node;
@@ -588,7 +609,7 @@ void SimplifyNeutral(Node *node)
 
                 NUM_CTOR(CURR, 0);
             }
-            else if (IS_ONE(RIGHT))
+            else if (IS_ONE(LEFT))
             {
                 free(LEFT);
                 TreeDtor(RIGHT);
