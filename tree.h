@@ -20,8 +20,8 @@ struct Node
     Node *right;
 };
 
-void   TreeCtor     (Node *tree);
-void   TreeDtor     (Node *tree);
+void   TreeCtor     (Node *node);
+void   TreeDtor     (Node *node);
 
 void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node *right);
 Node  *NodeNew      ();

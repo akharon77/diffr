@@ -6,18 +6,21 @@
 #include "tree.h"
 #include "diffr.h"
 
-void TreeDtor(Node *vertex)
+#define CURR node
+
+void TreeDtor(Node *node)
 {
-    ASSERT(vertex != NULL);
+    ASSERT(node != NULL);
 
-    if (!NodeIsLeaf(vertex))
-    {
-        TreeDtor(vertex->left);
-        TreeDtor(vertex->right);
-    }
+    if (LEFT)
+        TreeDtor(LEFT);
+    if (RIGHT)
+        TreeDtor(RIGHT);
 
-    free(vertex);
+    free(CURR);
 }
+
+#undef CURR
 
 Node *NodeNew()
 {
@@ -70,3 +73,4 @@ void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node
             .right = right 
         };
 }
+

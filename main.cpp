@@ -5,14 +5,14 @@
 
 int main(int argc, const char *argv[])
 {
-    Node *root = NodeNew();
-    GetExpression("x*0", root);
-    DiffrDumpToFileDfs(root, 1, 0);
-    printf("\n");
-    Simplify(root);
-    DiffrDumpToFileDfs(root, 1, 0);
+    // Node *root = NodeNew();
+    // GetExpression("x*0+2*1", root);
+    // DiffrDumpToFileDfs(root, 1, 0);
+    // printf("\n");
+    // Simplify(root);
+    // DiffrDumpToFileDfs(root, 1, 0);
 
-    return 0;
+    // return 0;
 
     int err = 0;
 

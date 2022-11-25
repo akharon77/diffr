@@ -617,12 +617,21 @@ void SimplifyNeutral(Node *node)
 
                 NUM_CTOR(CURR, 0);
             }
-            else if (IS_ONE(LEFT))
+            else if (IS_ONE(LEFT) || IS_ZERO(RIGHT))
             {
-                free(LEFT);
+                TreeDtor(LEFT);
                 TreeDtor(RIGHT);
 
                 NUM_CTOR(CURR, 1);
+            }
+            else if (IS_ONE(RIGHT))
+            {
+                free(RIGHT);
+
+                Node *last_left =  LEFT;
+                     *CURR      = *LEFT;
+                
+                free(last_left);
             }
     }
 }
