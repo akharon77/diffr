@@ -4,6 +4,7 @@
 
 #include "stack_debug.h"
 #include "tree.h"
+#include "diffr.h"
 
 void TreeDtor(Node *vertex)
 {
@@ -26,16 +27,20 @@ Node *NodeNew()
     return res;
 }
 
+#define CURR node
+
 Node *TreeCopy(Node *node)
 {
     Node *node_cpy = NodeNew();
-    *node_cpy = *node;
+         *node_cpy = *node;
 
-    if (!NodeIsLeaf(node))
-    {
-        node_cpy->left  = TreeCopy(node->left);
-        node_cpy->right = TreeCopy(node->right);
-    }
+    node_cpy->left  = NULL;
+    node_cpy->right = NULL;
+
+    if (LEFT)
+        node_cpy->left = TreeCopy(LEFT);
+    if (RIGHT)
+        node_cpy->right = TreeCopy(RIGHT);
 
     return node_cpy;
 }
@@ -43,15 +48,17 @@ Node *TreeCopy(Node *node)
 void NodeAddChild(Node *node, Node *child)
 {
     if (!node->left)
-        node->left  = child;
+        LEFT  = child;
     else
-        node->right = child;
+        RIGHT = child;
 }
 
 bool NodeIsLeaf(Node *node)
 {
-    return node->left == NULL && node->right == NULL;
+    return LEFT == NULL && RIGHT == NULL;
 }
+
+#undef CURR
 
 void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node *right)
 {
