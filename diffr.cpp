@@ -101,11 +101,14 @@ void DiffrDumpToFileDfs(Node *node, int32_t fd, int64_t idx)
     dprintf(fd, "node%ld[shape=record, label=\" { %s | %s } \"];\n",
                 idx, type_str, value);
 
-    if (!NodeIsLeaf(node))
+    if (node->left != NULL)
     {
         dprintf(fd, "node%ld->node%ld;", idx, 2 * idx + 1);
         DiffrDumpToFileDfs(node->left,  fd, 2 * idx + 1);
+    }
 
+    if (node->right != NULL)
+    {
         dprintf(fd, "node%ld->node%ld;", idx, 2 * idx + 2);
         DiffrDumpToFileDfs(node->right, fd, 2 * idx + 2);
     }
@@ -279,9 +282,13 @@ const char *GetPrimary(const char *str, Node *value)
     {
         str = GetNumber(str, value);
     }
-    else
+    else if (*str == 'x')
     {
         str = GetVariable(str, value);
+    }
+    else
+    {
+        str = GetFunction(str, value);
     }
 
     return str;
@@ -357,17 +364,19 @@ const char *GetFunction(const char *str, Node *value)
     ++str;
 
     OP_CTOR(value, op, NULL, arg);
+
+    return str;
 }
 
 #define CURR node
 
 void Simplify(Node *node)
 {
-    if (!NodeIsLeaf(CURR))
-    {
+    if (LEFT)
         Simplify (LEFT);
+
+    if (RIGHT)
         Simplify (RIGHT);
-    }
 
     RotateCommutative (CURR);
     SimplifyConst     (CURR);
