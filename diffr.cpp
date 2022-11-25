@@ -401,10 +401,10 @@ void SimplifyConst(Node *node)
                 node->value = {.dbl = GET_NUM(LEFT) - GET_NUM(RIGHT)};
                 break;
             case OP_MUL:
-                node->value = {.dbl = GET_NUM(LEFT) / GET_NUM(RIGHT)};
+                node->value = {.dbl = GET_NUM(LEFT) * GET_NUM(RIGHT)};
                 break;
             case OP_DIV:
-                node->value = {.dbl = GET_NUM(LEFT) * GET_NUM(RIGHT)};
+                node->value = {.dbl = GET_NUM(LEFT) / GET_NUM(RIGHT)};
                 break;
             case OP_SIN:
                 node->value = {.dbl = sin(GET_NUM(RIGHT))};
