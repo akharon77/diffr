@@ -300,13 +300,7 @@ const char *GetNumber(const char *str, Node *value)
 
     assert(str != str_old);
 
-    *value = 
-        {
-            .type  = TYPE_NUM,
-            .value = {.dbl = res},
-            .left  = NULL,
-            .right = NULL
-        };
+    NUM_CTOR(value, res);
 
     return str;
 }
@@ -329,6 +323,40 @@ const char *GetVariable(const char *str, Node *value)
         };
 
     return str;
+}
+
+const char *GetFunction(const char *str, Node *value)
+{
+    int32_t op = 0;
+
+    if (strncmp(str, "sin", 3))
+    {
+        op = OP_SIN;
+        str += 3;
+    }
+    else if (strncmp(str, "cos", 3))
+    {
+        op = OP_COS;
+        str += 3;
+    }
+    else if (strncmp(str, "ln", 2))
+    {
+        op = OP_LN;
+        str += 2;
+    }
+    else
+        assert(0 && "Wrong function");
+
+    assert(*str == '(');
+    ++str;
+
+    Node *arg = NodeNew();
+    str = GetExpression(str, arg);
+
+    assert(*str == ')');
+    ++str;
+
+    OP_CTOR(value, op, NULL, arg);
 }
 
 #define CURR node

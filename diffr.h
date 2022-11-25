@@ -7,6 +7,7 @@
 
 #define NUM_CTOR(node, val)   NodeCtor   (node,     TYPE_NUM, {.dbl = val}, NULL, NULL)
 #define CREATE_NUM(val)       CreateNode (          TYPE_NUM, {.dbl = val}, NULL, NULL)
+#define OP_CTOR(op, lhs, rhs) NodeCtor (TYPE_OP, {.op = op}, lhs, rhs)
 
 #define LEFT           (CURR)->left
 #define RIGHT          (CURR)->right
@@ -114,5 +115,6 @@ const char *GetTerm       (const char *str, Node *value);
 const char *GetPrimary    (const char *str, Node *value);
 const char *GetNumber     (const char *str, Node *value);
 const char *GetVariable   (const char *str, Node *value);
+const char *GetFunction   (const char *str, Node *value);
 
 #endif  // DIFFR_H
