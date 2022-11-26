@@ -29,7 +29,7 @@ void        DiffrDtor           (Diffr *diffr);
 void        DiffrRun            (Diffr *diffr);
 
 void        DiffrInput          (Diffr *diffr, const char *filename, int32_t *err);
-TreeNode       *DiffrParse          (int32_t pos, int32_t *end_pos, TextInfo *text);
+TreeNode   *DiffrParse          (int32_t pos, int32_t *end_pos, TextInfo *text);
 
 void        DiffrDump           (Diffr *diffr);
 void        DumpToFile          (TreeNode *node, int32_t fd, int64_t idx);

@@ -71,7 +71,7 @@ void DumpToFile(TreeNode *node, int32_t fd, int64_t idx)
     }
 }
 
-const char *GetOperatorString(int32_t op_code)
+const char *GetOperatorStringLatex(int32_t op_code)
 {
     switch (op_code)
     {
@@ -80,17 +80,40 @@ const char *GetOperatorString(int32_t op_code)
         case OP_SUB:
             return "-";
         case OP_MUL:
-            return "*";
-        case OP_DIV:
-            return "/";
+            return "\\cdot";
         case OP_SIN:
-            return "sin";
+            return "\\sin";
         case OP_COS:
-            return "cos";
+            return "\\cos";
         case OP_EXP:
             return "^";
         case OP_LN:
-            return "ln";
+            return "\\ln";
+        default:
+            return "";
+    }
+}
+
+const char *GetOperatorString(int32_t op_code)
+{
+    switch (op_code)
+    {
+        case OP_ADD:
+            return "{ADD | +}";
+        case OP_SUB:
+            return "{SUB | -}";
+        case OP_MUL:
+            return "{MUL | *}";
+        case OP_DIV:
+            return "{DIV | /}";
+        case OP_SIN:
+            return "{SIN | sin}";
+        case OP_COS:
+            return "{COS | cos}";
+        case OP_EXP:
+            return "{EXP | ^}";
+        case OP_LN:
+            return "{LN | ln}";
         default:
             return "(null)";
     }

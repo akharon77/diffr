@@ -1,19 +1,12 @@
 #include <stdio.h>
 
 #include "diffr.h"
+#include "parser.h"
 #include "colors.h"
+#include "log.h"
 
 int main(int argc, const char *argv[])
 {
-    // Node *root = NodeNew();
-    // GetExpression("x*0+2*1", root);
-    // DiffrDumpToFileDfs(root, 1, 0);
-    // printf("\n");
-    // Simplify(root);
-    // DiffrDumpToFileDfs(root, 1, 0);
-
-    // return 0;
-
     int err = 0;
 
     int run_mode = HELP_OPTION;
@@ -35,6 +28,10 @@ int main(int argc, const char *argv[])
 
     DiffrRun(&diffr);
     DiffrDump(&diffr);
+
+    char str[1024] = "";
+    PrintToStrLatex(diffr.root, str);
+    printf("%s\n", str);
     
     DiffrDtor(&diffr);
 

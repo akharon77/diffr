@@ -39,35 +39,78 @@ void LoggerPrintToStrLatex(Logger *log, char *str, int32_t id)
 
 char *PrintToStrLatex(TreeNode *node, char *str)
 {
+    int32_t offset = 0;
+
+    sprintf(str, "{");
+    ++str;
+
     switch (GET_TYPE(CURR))
     {
         case NODE_TYPE_NUM:
-            sprintf(str, "%lf", GET_NUM(CURR));
+            {
+                sprintf(str, "%lf%n", GET_NUM(CURR), &offset);
+                str += offset;
+            }
             break;
         case NODE_TYPE_VAR:
-            sprintf(str, "%s", GET_VAR(CURR));
+            {
+                sprintf(str, "%s%n", GET_VAR(CURR), &offset);
+                str += offset;
+            }
             break;
         case NODE_TYPE_OP:
             {
-                if (IS_OP(LEFT) && GetOperatorPriority(GET_OP(LEFT)) < GetOperatorPriority(GET_OP(CURR)))
-                    *str++ = '(';
-                str = PrintToStrLatex(LEFT, str);
-                if (IS_OP(LEFT) && GetOperatorPriority(GET_OP(LEFT)) < GetOperatorPriority(GET_OP(CURR)))
-                    *str++ = ')';
+                if (GET_OP(CURR) == OP_DIV)
+                {
+                    sprintf(str, "\\frac");
+                    str += 5;
+                }
 
-                int32_t offset = 0;
-                sprintf(str, "%s%n", GetOperatorString(GET_OP(CURR)), &offset);
+                if (LEFT)
+                {
+                    if (IS_OP(LEFT) && GetOperatorPriority(GET_OP(LEFT)) < GetOperatorPriority(GET_OP(CURR)))
+                    {
+                        sprintf(str, "\\left(");
+                        str += 6;
+                    }
+
+                    str = PrintToStrLatex(LEFT, str);
+
+                    if (IS_OP(LEFT) && GetOperatorPriority(GET_OP(LEFT)) < GetOperatorPriority(GET_OP(CURR)))
+                    {
+                        sprintf(str, "\\right)");
+                        str += 7;
+                    }
+                }
+
+                sprintf(str, "%s%n", GetOperatorStringLatex(GET_OP(CURR)), &offset);
                 str += offset;
 
-                if (IS_OP(RIGHT) && GetOperatorPriority(GET_OP(RIGHT)) < GetOperatorPriority(GET_OP(CURR)))
-                    *str++ = '(';
-                str = PrintToStrLatex(RIGHT, str);
-                if (IS_OP(RIGHT) && GetOperatorPriority(GET_OP(RIGHT)) < GetOperatorPriority(GET_OP(CURR)))
-                    *str++ = ')';
+                if (RIGHT)
+                {
+                    if (IS_OP(RIGHT) && GetOperatorPriority(GET_OP(RIGHT)) < GetOperatorPriority(GET_OP(CURR)))
+                    {
+                        sprintf(str, "\\left(");
+                        str += 6;
+                    }
+
+                    str = PrintToStrLatex(RIGHT, str);
+
+                    if (IS_OP(RIGHT) && GetOperatorPriority(GET_OP(RIGHT)) < GetOperatorPriority(GET_OP(CURR)))
+                    {
+                        sprintf(str, "\\right)");
+                        str += 7;
+                    }
+                }
             }
+            break;
         default:
             ASSERT(0);
     }
+
+    sprintf(str, "}");
+    ++str;
+
     return str;
 }
 
