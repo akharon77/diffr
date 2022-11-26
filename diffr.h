@@ -5,6 +5,8 @@
 #include "tree.h"
 #include "stack.h"
 #include "dsl.h"
+#include "log.h"
+#include "diffr_struct.h"
 
 enum OPTIONS
 {
@@ -16,57 +18,32 @@ enum OPTIONS
     N_OPTIONS
 };
 
-enum NODE_TYPES
-{
-    NODE_TYPE_OP,
-    NODE_TYPE_NUM,
-    NODE_TYPE_VAR
-};
-
-enum OP_CODES
-{
-    OP_ADD,
-    OP_SUB,
-    OP_MUL,
-    OP_DIV,
-    OP_SIN,
-    OP_COS,
-    OP_EXP,
-    OP_LN
-};
-
-struct Diffr
-{
-    char *filename;
-
-    TreeNode *root;
-};
-
 extern const Option       EXEC_OPTIONS[];
 extern const size_t       N_EXEC_OPTIONS;
 
 const int32_t MAX_STR_OBJ_LEN = 128;
 
-void        DiffrCtor         (Diffr *diffr);
-void        DiffrDtor         (Diffr *diffr);
+void        DiffrCtor           (Diffr *diffr);
+void        DiffrDtor           (Diffr *diffr);
 
-void        DiffrRun          (Diffr *diffr);
+void        DiffrRun            (Diffr *diffr);
 
-void        DiffrInput        (Diffr *diffr, const char *filename, int32_t *err);
-TreeNode       *DiffrParse        (int32_t pos, int32_t *end_pos, TextInfo *text);
+void        DiffrInput          (Diffr *diffr, const char *filename, int32_t *err);
+TreeNode       *DiffrParse          (int32_t pos, int32_t *end_pos, TextInfo *text);
 
-void        DiffrDump         (Diffr *diffr);
-void        DumpToFile        (TreeNode *node, int32_t fd, int64_t idx);
+void        DiffrDump           (Diffr *diffr);
+void        DumpToFile          (TreeNode *node, int32_t fd, int64_t idx);
 
-TreeNode       *Differentiate     (TreeNode *node);
+TreeNode*   Differentiate       (TreeNode *node, Diffr *diffr);
 
-void        Simplify          (TreeNode *node);
+void        Simplify            (TreeNode *node);
 
-void        SimplifyConst     (TreeNode *node);
-void        SimplifyNeutral   (TreeNode *node);
+void        SimplifyConst       (TreeNode *node);
+void        SimplifyNeutral     (TreeNode *node);
 
-void        RotateCommutative (TreeNode *node);
+void        RotateCommutative   (TreeNode *node);
 
-const char *GetOperatorString (int32_t op_code);
+const char *GetOperatorString   (int32_t op_code);
+int32_t     GetOperatorPriority (int32_t op_code);
 
 #endif  // DIFFR_H

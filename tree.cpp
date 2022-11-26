@@ -8,7 +8,7 @@
 
 #define CURR node
 
-void TreeDtor(Node *node)
+void TreeDtor(TreeNode *node)
 {
     ASSERT(node != NULL);
 
@@ -22,9 +22,9 @@ void TreeDtor(Node *node)
 
 #undef CURR
 
-Node *NodeNew()
+TreeNode *TreeNodeNew()
 {
-    Node *res = (Node*) calloc(1, sizeof(Node));
+    TreeNode *res = (TreeNode*) calloc(1, sizeof(TreeNode));
     ASSERT(res != NULL);
 
     return res;
@@ -32,10 +32,10 @@ Node *NodeNew()
 
 #define CURR node
 
-Node *TreeCopy(Node *node)
+TreeNode *TreeCopy(TreeNode *node)
 {
-    Node *node_cpy = NodeNew();
-         *node_cpy = *node;
+    TreeNode *node_cpy =  TreeNodeNew();
+             *node_cpy = *node;
 
     node_cpy->left  = NULL;
     node_cpy->right = NULL;
@@ -48,7 +48,7 @@ Node *TreeCopy(Node *node)
     return node_cpy;
 }
 
-void NodeAddChild(Node *node, Node *child)
+void TreeNodeAddChild(TreeNode *node, TreeNode *child)
 {
     if (!node->left)
         LEFT  = child;
@@ -56,14 +56,14 @@ void NodeAddChild(Node *node, Node *child)
         RIGHT = child;
 }
 
-bool NodeIsLeaf(Node *node)
+bool NodeIsLeaf(TreeNode *node)
 {
     return LEFT == NULL && RIGHT == NULL;
 }
 
 #undef CURR
 
-void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node *right)
+void   TreeNodeCtor(TreeNode *node, int32_t type, TreeNodeValue value, TreeNode *left, TreeNode *right)
 {
     *node = 
         {
@@ -74,11 +74,11 @@ void   NodeCtor     (Node *node, int32_t type, NodeValue value, Node *left, Node
         };
 }
 
-Node *CreateNode(int32_t type, NodeValue val, Node *left, Node *right)
+TreeNode *CreateTreeNode(int32_t type, TreeNodeValue val, TreeNode *left, TreeNode *right)
 {
-    Node *node = NodeNew();
+    TreeNode *node = TreeNodeNew();
 
-    NodeCtor(node, type, val, left, right);
+    TreeNodeCtor(node, type, val, left, right);
 
     return node;
 }

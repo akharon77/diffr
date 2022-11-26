@@ -6,7 +6,7 @@
 #include "tree.h"
 #include "diffr.h"
 
-const char *GetGeneral(const char *str, Node *value)
+const char *GetGeneral(const char *str, TreeNode *value)
 {
     str = GetExpression(str, value);
 
@@ -16,9 +16,9 @@ const char *GetGeneral(const char *str, Node *value)
     return str;
 }
 
-const char *GetExpression(const char *str, Node *value)
+const char *GetExpression(const char *str, TreeNode *value)
 {
-    Node *top_node = NodeNew();
+    TreeNode *top_node = TreeNodeNew();
     str = GetProduct(str, top_node);
 
     while (*str == '+' || *str == '-')
@@ -26,7 +26,7 @@ const char *GetExpression(const char *str, Node *value)
         char op = *str;
         ++str;
 
-        Node *buf_val = NodeNew();
+        TreeNode *buf_val = TreeNodeNew();
         str = GetProduct(str, buf_val);
 
         switch (op)
@@ -48,9 +48,9 @@ const char *GetExpression(const char *str, Node *value)
     return str;
 }
 
-const char *GetProduct(const char *str, Node *value)
+const char *GetProduct(const char *str, TreeNode *value)
 {
-    Node *top_node = NodeNew();
+    TreeNode *top_node = TreeNodeNew();
     str = GetPower(str, top_node);
 
     while (*str == '*' || *str == '/')
@@ -58,7 +58,7 @@ const char *GetProduct(const char *str, Node *value)
         char op = *str;
         ++str;
 
-        Node *buf_val = NodeNew();
+        TreeNode *buf_val = TreeNodeNew();
         str = GetPower(str, buf_val);
 
         switch (op)
@@ -80,14 +80,14 @@ const char *GetProduct(const char *str, Node *value)
     return str;
 }
 
-const char *GetPower(const char *str, Node *value)
+const char *GetPower(const char *str, TreeNode *value)
 {
-    Node *top_node = NodeNew();
+    TreeNode *top_node = TreeNodeNew();
     str = GetPrimary(str, top_node);
 
     while (*str == '^')
     {
-        Node *buf_val = NodeNew();
+        TreeNode *buf_val = TreeNodeNew();
 
         ++str;
         str = GetPrimary(str, buf_val);
@@ -101,7 +101,7 @@ const char *GetPower(const char *str, Node *value)
     return str;
 }
 
-const char *GetPrimary(const char *str, Node *value)
+const char *GetPrimary(const char *str, TreeNode *value)
 {
     if (*str == '(')
     {
@@ -127,7 +127,7 @@ const char *GetPrimary(const char *str, Node *value)
     return str;
 }
 
-const char *GetNumber(const char *str, Node *value)
+const char *GetNumber(const char *str, TreeNode *value)
 {
     int32_t res = 0;
     const char *str_old = str;
@@ -145,7 +145,7 @@ const char *GetNumber(const char *str, Node *value)
     return str;
 }
 
-const char *GetVariable(const char *str, Node *value)
+const char *GetVariable(const char *str, TreeNode *value)
 {
     const char *str_old = str;
 
@@ -156,7 +156,7 @@ const char *GetVariable(const char *str, Node *value)
 
     *value = 
         {
-            .type  = TYPE_VAR,
+            .type  = NODE_TYPE_VAR,
             .value = {.var = strndup(str_old, str - str_old)},
             .left  = NULL,
             .right = NULL
@@ -165,7 +165,7 @@ const char *GetVariable(const char *str, Node *value)
     return str;
 }
 
-const char *GetFunction(const char *str, Node *value)
+const char *GetFunction(const char *str, TreeNode *value)
 {
     int32_t op = 0;
 
@@ -190,7 +190,7 @@ const char *GetFunction(const char *str, Node *value)
     assert(*str == '(');
     ++str;
 
-    Node *arg = NodeNew();
+    TreeNode *arg = TreeNodeNew();
     str = GetExpression(str, arg);
 
     assert(*str == ')');

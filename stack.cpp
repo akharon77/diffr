@@ -89,7 +89,7 @@ Elem StackPop(Stack *stk)
     int64_t prevSize = stk->size;
     StackResize (stk, stk->size - 1);
     if (stk->capacity >= prevSize)
-        stk->data[stk->size] = POISON;
+        ;//stk->data[stk->size] = POISON;
     
 ON_HASH_PROT(
     StackRehash(stk);
@@ -148,7 +148,7 @@ void StackFillPoison(Stack *stk, int64_t l, int64_t r)
     ASSERT(!isBadPtr(stk));
 
     for (int64_t i = l; i < r; ++i)
-        stk->data[i] = POISON;
+        ;//stk->data[i] = POISON;
 
 ON_HASH_PROT(
     StackRehash(stk);
@@ -254,7 +254,7 @@ ON_HASH_PROT(
 )
 
     for (int64_t i = stk->size; i < stk->capacity; ++i)
-        flags |= (stk->data[i] != POISON) ? STACK_DATA_POSION_ERROR : 0;
+        ;  //flags |= (stk->data[i] != POISON) ? STACK_DATA_POSION_ERROR : 0;
 
     return flags;
 }
@@ -280,58 +280,6 @@ void closeLogBuffer()
 
 void StackDump(Stack *stk, const char* func, const char* file, long int line)
 {
-ON_DEBUG(
-    ASSERT(!isBadPtr(stk));
-    int fdLogBuffer = getfdLogBuffer();
-
-    dprintf(fdLogBuffer,"StackDump: from %s in %s(%ld)\n"
-                        "Stack[%p]\n"
-                        "Status: %s\n"
-                        "%s at %s in %s(%ld): \n"
-                        "{\n\tsize = %ld, \n"
-                        "\tcapacity = %ld, \n",
-                        func, file, line,
-                        stk,
-                        StackGetStatus(stk),
-                        stk->info.name, stk->info.funcname, stk->info.filename, stk->info.line,
-                        stk->size,
-                        stk->capacity);
-
-ON_CANARY_PROT(
-    dprintf(fdLogBuffer, "\tcanary1 = %lx\n", stk->canary1);
-)
-
-    dprintf(fdLogBuffer, "\tdata[%p] = \n\t{\n", stk->data ON_CANARY_PROT(-1));
-
-ON_CANARY_PROT(
-    dprintf(fdLogBuffer, "\t(c)\t[-1] = %lx\n", stk->data[-1]);
-)
-
-    for (int64_t i = 0; i < stk->size; ++i)
-        dprintf(fdLogBuffer, "\t(*)\t[%ld] = %ld\n", i, stk->data[i]);
-
-    for (int64_t i = stk->size; i < stk->capacity; ++i)
-        dprintf(fdLogBuffer, "\t\t[%ld] = %ld\n", i, stk->data[i]);
-
-ON_CANARY_PROT(
-    dprintf(fdLogBuffer, "\t(c)\t[%ld] = %lx\n",
-                         stk->capacity + 1,
-                         stk->data[stk->capacity]);
-)
-
-ON_HASH_PROT(
-    dprintf(fdLogBuffer, "\thashData = %lx,\n"
-                         "\thashStk  = %lx\n",
-                         stk->hashData,
-                         stk->hashStk);
-)
-
-ON_CANARY_PROT(
-    dprintf(fdLogBuffer, "\tcanary2 = %lx\n", stk->canary2);
-)
-
-    dprintf(fdLogBuffer, "\t}\n}\n\n");
-)
 }
 
 ON_HASH_PROT(

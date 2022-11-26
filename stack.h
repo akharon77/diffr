@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <string.h>
+
 #include "stack_struct.h"
 #include "stack_prot.h"
 #include "stack_debug.h"

@@ -1,6 +1,8 @@
 #ifndef STACK_DEBUG_H
 #define STACK_DEBUG_H
 
+#include <stdio.h>
+
 struct DebugInfo
 {
     int64_t    line;

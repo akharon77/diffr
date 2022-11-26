@@ -1,7 +1,8 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "list.h"
+#include "diffr_struct.h"
+#include "log_struct.h"
 
 enum CONV_TYPES
 {
@@ -20,20 +21,13 @@ enum CONV_TYPES
     CONV_TYPES_N
 };
 
-struct Conv
-{
-    int32_t   type;
-    TreeNode *node;
-};
+void        LoggerCtor            (Logger *logger, Diffr *diffr);
+void        LoggerDtor            (Logger *logger);
+void        LoggerLog             (Logger *logger, int32_t type, TreeNode *node);
 
-struct Logger
-{
-    List convs;
-    
-    char *filename;
-};
+const char *GetConvDesc           (int32_t type);
 
-void LoggerCtor (Logger *logger, Diffr *diffr);
-void LoggerDtor (Logger *logger);
+void        LoggerPrintToStrLatex (Logger *log, char *str, int32_t id);
+char       *PrintToStrLatex       (TreeNode *node, char *str);
 
 #endif  // LOG_H

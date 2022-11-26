@@ -3,8 +3,15 @@
 
 #include "stack_debug.h"
 #include "stack_prot.h"
+#include "tree_struct.h"
 
-#define Elem int64_t
+#define Elem Conv
+
+struct Conv
+{
+    int32_t   type;
+    TreeNode *node;
+};
 
 struct Stack
 {
