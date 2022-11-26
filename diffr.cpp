@@ -13,7 +13,7 @@
 #include "colors.h"
 #include "parser.h"
 #include "dsl.h"
-#include "log.cpp"
+#include "log.h"
 
 const Option EXEC_OPTIONS[] = 
     {
@@ -65,6 +65,7 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
 }
 
 #define DFR diffr
+#define CURR node
 
 TreeNode* Differentiate(TreeNode *node, Diffr *diffr)
 {
