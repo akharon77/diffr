@@ -8,8 +8,8 @@
 #define LEFT                        (CURR)->left
 #define RIGHT                       (CURR)->right
 
-#define D_L                         Differentiate (LEFT, DFR)
-#define D_R                         Differentiate (RIGHT, DFR)
+#define D_L                         Differentiate (LEFT, LGR)
+#define D_R                         Differentiate (RIGHT, LGR)
 
 #define CP_L                        TreeCopy (LEFT)
 #define CP_R                        TreeCopy (RIGHT)

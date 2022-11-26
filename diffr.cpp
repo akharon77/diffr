@@ -40,12 +40,12 @@ void DiffrDtor(Diffr *diffr)
 
 void DiffrRun(Diffr *diffr)
 {
-    TreeNode *df_node = Differentiate(diffr->root, diffr);
+    TreeNode *df_node = Differentiate(diffr->root, &diffr->logger);
 
     TreeDtor(diffr->root);
     diffr->root = df_node;
 
-    Simplify(diffr->root);
+    Simplify(diffr->root, &diffr->logger);
 }
 
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
@@ -64,117 +64,137 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
     TextInfoDtor(&text);
 }
 
-#define DFR diffr
+#define LGR logger
 #define CURR node
 
-TreeNode* Differentiate(TreeNode *node, Diffr *diffr)
+TreeNode* Differentiate(TreeNode *node, Logger *logger)
 {
     ASSERT(node != NULL);
+
+    TreeNode *result = NULL;
 
     switch (node->type)
     {
         case NODE_TYPE_NUM: 
             {
-                LoggerLog(&diffr->logger, CONV_TYPE_CONST, CURR);
-                return CREATE_NUM(0);
+                LoggerLog(logger, CONV_TYPE_CONST, CURR);
+                result = CREATE_NUM(0);
             }
+            break;
         case NODE_TYPE_VAR:
             {
-                LoggerLog(&diffr->logger, CONV_TYPE_SOLO_VAR, CURR);
-                return CREATE_NUM(1);
+                LoggerLog(logger, CONV_TYPE_SOLO_VAR, CURR);
+                result = CREATE_NUM(1);
             }
+            break;
         case NODE_TYPE_OP:
-            switch (node->value.op)
+            switch (GET_OP(CURR))
             {
                 case OP_ADD: 
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_ADD, CURR);
-                        return ADD(D_L, D_R);
+                        LoggerLog(logger, CONV_TYPE_ADD, CURR);
+                        result = ADD(D_L, D_R);
                     }
+                break;
                 case OP_SUB:
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_ADD, CURR);
-                        return SUB(D_L, D_R);
+                        LoggerLog(logger, CONV_TYPE_ADD, CURR);
+                        result = SUB(D_L, D_R);
                     }
+                break;
 
                 case OP_MUL:
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_MUL, CURR);
-                        return ADD(MUL(D_L, CP_R), MUL(CP_L, D_R));
+                        LoggerLog(logger, CONV_TYPE_MUL, CURR);
+                        result = ADD(MUL(D_L, CP_R), MUL(CP_L, D_R));
                     }
+                break;
                 case OP_DIV:
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_DIV, CURR);
-                        return DIV(SUB(MUL(D_L, CP_R), MUL(CP_L, D_R)), MUL(CP_R, CP_R));
+                        LoggerLog(logger, CONV_TYPE_DIV, CURR);
+                        result = DIV(SUB(MUL(D_L, CP_R), MUL(CP_L, D_R)), MUL(CP_R, CP_R));
                     }
+                break;
 
                 case OP_SIN:
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_SIN, CURR);
-                        return MUL(COS(CP_R), D_R);
+                        LoggerLog(logger, CONV_TYPE_SIN, CURR);
+                        result = MUL(COS(CP_R), D_R);
                     }
+                break;
                 case OP_COS:
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_COS, CURR);
-                        return MUL(CREATE_NUM(-1), MUL(SIN(CP_R), D_R));
+                        LoggerLog(logger, CONV_TYPE_COS, CURR);
+                        result = MUL(CREATE_NUM(-1), MUL(SIN(CP_R), D_R));
                     }
+                break;
 
                 case OP_EXP:
                     if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_EXP_CONST_CONST, CURR);
-                        return CREATE_NUM(0);
+                        LoggerLog(logger, CONV_TYPE_EXP_CONST_CONST, CURR);
+                        result = CREATE_NUM(0);
                     }
                     else if (IS_NUM(LEFT) && IS_FUNC(RIGHT))
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_EXP_CONST_FUNC, CURR);
-                        return MUL(EXP(CP_L, CP_R), MUL(LN(CP_L), D_R));
+                        LoggerLog(logger, CONV_TYPE_EXP_CONST_FUNC, CURR);
+                        result = MUL(EXP(CP_L, CP_R), MUL(LN(CP_L), D_R));
                     }
                     else if (IS_FUNC(LEFT) && IS_NUM(RIGHT))
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_EXP_FUNC_CONST, CURR);
-                        return MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
+                        LoggerLog(logger, CONV_TYPE_EXP_FUNC_CONST, CURR);
+                        result = MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
                     }
                     else
                         {
-                            LoggerLog(&diffr->logger, CONV_TYPE_EXP_FUNC_FUNC, CURR);
+                            LoggerLog(logger, CONV_TYPE_EXP_FUNC_FUNC, CURR);
                             TreeNode *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));  // TODO: e const
-                            TreeNode *res = Differentiate(fict_node, diffr);
+                            TreeNode *res = Differentiate(fict_node, logger);
                             TreeDtor(fict_node);
 
-                            return res;
+                            result = res;
                         }
+                break;
                 
                 case OP_LN:
                     {
-                        LoggerLog(&diffr->logger, CONV_TYPE_LN, CURR);
-                        return MUL(DIV(CREATE_NUM(1), CP_R), D_R);
+                        LoggerLog(logger, CONV_TYPE_LN, CURR);
+                        result = MUL(DIV(CREATE_NUM(1), CP_R), D_R);
                     }
+                break;
             }
+        break;
+        default:
+            ASSERT(0);
     }
+
+    LoggerLog(logger, CONV_TYPE_RESULT, result);
+    return result;
 }
 
 #undef DFR
 
-void Simplify(TreeNode *node)
+void Simplify(TreeNode *node, Logger *logger)
 {
     if (LEFT)
-        Simplify (LEFT);
+        Simplify (LEFT,  logger);
 
     if (RIGHT)
-        Simplify (RIGHT);
+        Simplify (RIGHT, logger);
 
     RotateCommutative (CURR);
-    SimplifyConst     (CURR);
-    SimplifyNeutral   (CURR);
+    SimplifyConst     (CURR, logger);
+    SimplifyNeutral   (CURR, logger);
 }
 
-void SimplifyConst(TreeNode *node)
+void SimplifyConst(TreeNode *node, Logger *logger)
 {
-    if (IS_VAR(node) || IS_NUM(node))
+    if (IS_VAR(CURR) || IS_NUM(CURR))
         return;
     
-    switch (node->value.op)
+    LoggerLog(logger, CONV_TYPE_SIMP_CONST, CURR);
+
+    switch (GET_OP(CURR))
     {
         case OP_ADD:
             {
@@ -318,14 +338,18 @@ void SimplifyConst(TreeNode *node)
         default:
             assert(0 && "Wrong operation");
     }
+    
+    LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
-void SimplifyNeutral(TreeNode *node)
+void SimplifyNeutral(TreeNode *node, Logger *logger)
 {
-    if (IS_NUM(node) || IS_VAR(node))
+    if (IS_NUM(CURR) || IS_VAR(CURR))
         return;
 
-    switch (node->value.op)
+    LoggerLog(logger, CONV_TYPE_SIMP_NEUT, CURR);
+
+    switch (GET_OP(CURR))
     {
         case OP_ADD:
             if (IS_ZERO(LEFT))
@@ -399,6 +423,8 @@ void SimplifyNeutral(TreeNode *node)
                 free(last_left);
             }
     }
+
+    LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
 void RotateCommutative(TreeNode *node)
@@ -406,8 +432,8 @@ void RotateCommutative(TreeNode *node)
     if ((IS_OP_CODE(CURR, OP_ADD) || IS_OP_CODE(CURR, OP_MUL)) && IS_NUM(RIGHT))
     {
         TreeNode *buf   = LEFT;
-              LEFT  = RIGHT;
-              RIGHT = buf;
+                  LEFT  = RIGHT;
+                  RIGHT = buf;
     }
 }
 

@@ -29,9 +29,12 @@ int main(int argc, const char *argv[])
     DiffrRun(&diffr);
     DiffrDump(&diffr);
 
-    char str[1024] = "";
-    PrintToStrLatex(diffr.root, str);
-    printf("%s\n", str);
+    for (int32_t i = 0; i < diffr.logger.convs.size; ++i)
+    {
+        char str[1024] = "";
+        LoggerPrintToStrLatex(&diffr.logger, str, i);
+        printf("%s \n \\\\ \n\n", str);
+    }
     
     DiffrDtor(&diffr);
 

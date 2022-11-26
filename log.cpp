@@ -48,8 +48,20 @@ char *PrintToStrLatex(TreeNode *node, char *str)
     {
         case NODE_TYPE_NUM:
             {
-                sprintf(str, "%lf%n", GET_NUM(CURR), &offset);
+                if (GET_NUM(CURR) < -EPS)
+                {
+                    sprintf(str, "(");
+                    ++str;
+                }
+
+                sprintf(str, "%lg%n", GET_NUM(CURR), &offset);
                 str += offset;
+
+                if (GET_NUM(CURR) < -EPS)
+                {
+                    sprintf(str, ")");
+                    ++str;
+                }
             }
             break;
         case NODE_TYPE_VAR:
@@ -62,8 +74,8 @@ char *PrintToStrLatex(TreeNode *node, char *str)
             {
                 if (GET_OP(CURR) == OP_DIV)
                 {
-                    sprintf(str, "\\frac");
-                    str += 5;
+                    sprintf(str, "\\cfrac");
+                    str += 6;
                 }
 
                 if (LEFT)
