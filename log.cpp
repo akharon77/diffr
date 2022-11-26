@@ -2,11 +2,10 @@
 #include <string.h>
 
 #include "log.h"
-#include "list.h"
 
 void LoggerCtor(Logger *logger, Diffr *diffr)
 {
-    ListCtor(&logger->convs, 64);  // TODO
+    StackCtor(
     logger->filename = strdup(filename);
 }
 
