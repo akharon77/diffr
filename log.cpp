@@ -201,7 +201,15 @@ const char *GetGreekAlphabet(int32_t id)
             "\\o",
             "\\chi",
             "\\psi",
-            "\\omega"
+            "\\omega",
+            "\\Omega",
+            "\\Psi",
+            "\\Xi",
+            "\\O",
+            "\\Delta",
+            "\\Mu",
+            "\\Nu",
+            "\\Rho"
         };
 
     return latex_greek[id];

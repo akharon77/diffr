@@ -108,6 +108,6 @@ int TreeNodeGetSize(TreeNode *node)
 
 void TreeNodeUpdSize(TreeNode *node)
 {
-    node->size = TreeNodeGetSize(node->left) + TreeNodeGetSize(node->right);
+    node->size = TreeNodeGetSize(node->left) + TreeNodeGetSize(node->right) + 1;
 }
 
