@@ -65,7 +65,7 @@ void   TreeNodeCtor(TreeNode *node, int32_t type, TreeNodeValue value, TreeNode 
         {
             .type  = type,
             .value = value,
-            .size  = (left ? left->size : 0) + (right ? right->size : 0) + 1,
+            .size  = TreeNodeGetSize(left) + TreeNodeGetSize(right) + 1,
             .left  = left,
             .right = right 
         };
@@ -87,6 +87,27 @@ bool CompareTree(TreeNode *left, TreeNode *right)
     else if (left == NULL || right == NULL)
         return false;
 
-    return *left == *right && CompareTree(left->left, right->left) && CompareTree(left->right, right->right);
+    return IS_EQ_NODE(left, right) && CompareTree(left->left, right->left) && CompareTree(left->right, right->right);
+}
+
+TreeNode *GetMaxSubtree(TreeNode *node)
+{
+    if (node->left->size > node->right->size)
+        return node->left;
+
+    return node->right;
+}
+
+int TreeNodeGetSize(TreeNode *node)
+{
+    if (node)
+        return node->size;
+    
+    return 0;
+}
+
+void TreeNodeUpdSize(TreeNode *node)
+{
+    node->size = TreeNodeGetSize(node->left) + TreeNodeGetSize(node->right);
 }
 

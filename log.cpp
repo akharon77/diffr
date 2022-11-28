@@ -4,25 +4,23 @@
 #include "stack.h"
 #include "log.h"
 #include "dsl.h"
-#include "diffr_debug.h"
 #include "tree.h"
+#include "diffr_debug.h"
+#include "diffr.h"
 
 void LoggerCtor(Logger *logger, Diffr *diffr)
 {
     StackCtor(&logger->convs, LOGGER_STK_SIZE_BASE);  // TODO
 
-    logger->n_repl = 0;
-    for (int32_t i = 0; i < REPL_SIZE; ++i)
-        repl[i] = NULL;
+    logger->n_repl   = 0;
 
+    logger->diffr    = (void*) diffr;
     logger->filename = strdup(diffr->filename);
 }
 
 void LoggerDtor(Logger *logger)
 {
     StackDtor(&logger->convs);
-
-
 
     free(logger->filename);
 }
@@ -32,35 +30,34 @@ void LoggerDtor(Logger *logger)
 void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
 {
     TreeNode *node_cpy = TreeCopy(node);
+    printf("\n");
 
-    if (node->size > MAX_TREE_SIZE)
+    if (node_cpy->size > MAX_TREE_SIZE)
     {
-        Rotate(CURR);
-        Rotate(node_cpy);
-        
-        node->size -= LEFT->size;
-// останоновился на замене поддеревьев по размеру
-        TreeDtor(node_cpy->left);
-        CreateTreeNode(NODE_TYPE_VAR, {.var = GetGreekAlphabet(logger->n_repl++)}, NULL, NULL);
+        TreeNode *max_subtree = GetMaxSubtree(node_cpy);
 
-        LoggerLog(logger, CONV_TYPE_REPL, LEFT);
+        node_cpy->size -= max_subtree->size;
+        LoggerReplace(logger, max_subtree);
 
-        if (node->size > MAX_TREE_SIZE)
+        if (node_cpy->size > MAX_TREE_SIZE)
         {
-            node->size -= RIGHT->size;
-            
-            TreeDtor(node_cpy->right)
+            max_subtree = GetMaxSubtree(node_cpy);
 
-            LoggerLog(logger, CONV_TYPE_REPL, RIGHT);
+            node_cpy->size -= max_subtree->size;
+            LoggerReplace(logger, max_subtree);
         }
     }
 
     StackPush(&logger->convs, 
               {
                   .type = type, 
-                  .node = TreeCopy(node)
+                  .node = node_cpy
               });
 
+    TreeNode *buf = ((Diffr*) logger->diffr)->root;
+    ((Diffr*) logger->diffr)->root = node_cpy;
+    DiffrDump((Diffr*) logger->diffr);
+    ((Diffr*) logger->diffr)->root = buf;
 }
 
 void LoggerPrintToStrLatex(Logger *log, char *str, int32_t id)
@@ -87,6 +84,7 @@ do                                                                              
             str += 7;                                                                               \
         }                                                                                           \
     }                                                                                               \
+}                                                                                                   \
 while (0)
 
 char *PrintToStrLatex(TreeNode *node, char *str)
@@ -176,5 +174,47 @@ const char *GetConvDesc(int32_t type)
         case CONV_TYPE_EXP_FUNC_FUNC:
             return "complex exponential function";
     }
+}
+
+const char *GetGreekAlphabet(int32_t id)
+{
+    static const char* const latex_greek[] =
+        {
+            "\\alpha",
+            "\\beta",
+            "\\gamma",
+            "\\delta",
+            "\\varepsilon",
+            "\\zeta",
+            "\\eta",
+            "\\theta",
+            "\\iota",
+            "\\kappa",
+            "\\varkappa"
+            "\\lambda",
+            "\\mu",
+            "\\nu",
+            "\\delta",
+            "\\rho",
+            "\\varphi",
+            "\\xi",
+            "\\o",
+            "\\chi",
+            "\\psi",
+            "\\omega"
+        };
+
+    return latex_greek[id];
+}
+
+void LoggerReplace(Logger *logger, TreeNode *node)
+{
+    LoggerLog(logger, CONV_TYPE_REPL, node);
+
+    TreeDtor(node->left);
+    TreeDtor(node->right);
+    VAR_CTOR(node, GetGreekAlphabet(logger->n_repl++));
+    
+    LoggerLog(logger, CONV_TYPE_RESULT, node);
 }
 

@@ -55,8 +55,8 @@ void DumpToFile(TreeNode *node, int32_t fd, int64_t idx)
             break;
     }
 
-    dprintf(fd, "node%ld[shape=record, label=\" { %s | %s } \"];\n",
-                idx, type_str, value);
+    dprintf(fd, "node%ld[shape=record, label=\" { %s | %s | %d } \"];\n",
+                idx, type_str, value, node->size);
 
     if (LEFT)
     {

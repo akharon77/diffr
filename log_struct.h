@@ -1,13 +1,13 @@
 #ifndef LOG_STRUCT_H
 #define LOG_STRUCT_H
 
+#include "diffr_struct.h"
 #include "tree_struct.h"
 #include "stack_struct.h"
 
-const int32_t REPL_SIZE            = 24;
-const int32_t MAX_TREE_SIZE        = 50;
+const int32_t REPL_SIZE            = 26;
+const int32_t MAX_TREE_SIZE        = 30;
 const int32_t LOGGER_STK_SIZE_BASE = 64;
-
 
 enum CONV_TYPES
 {
@@ -35,8 +35,8 @@ struct Logger
     Stack     convs;
 
     int32_t   n_repl;
-    TreeNode *repl[REPL_SIZE];
     
+    void     *diffr;
     char     *filename;
 };
 

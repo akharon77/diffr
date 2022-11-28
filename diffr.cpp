@@ -61,6 +61,8 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
 
     diffr->filename = strdup(filename);
 
+    LoggerCtor(&diffr->logger, diffr);
+
     TextInfoDtor(&text);
 }
 
@@ -78,12 +80,17 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
         case NODE_TYPE_NUM: 
             {
                 LoggerLog(logger, CONV_TYPE_CONST, CURR);
+                logger->n_repl = 0;
                 result = CREATE_NUM(0);
             }
             break;
         case NODE_TYPE_VAR:
             {
+                if (strcasecmp(GET_VAR(CURR), "x"))
+                    break;  // TODO: select variable in diffr
+
                 LoggerLog(logger, CONV_TYPE_SOLO_VAR, CURR);
+                logger->n_repl = 0;
                 result = CREATE_NUM(1);
             }
             break;
@@ -93,12 +100,14 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
                 case OP_ADD: 
                     {
                         LoggerLog(logger, CONV_TYPE_ADD, CURR);
+                        logger->n_repl = 0;
                         result = ADD(D_L, D_R);
                     }
                 break;
                 case OP_SUB:
                     {
                         LoggerLog(logger, CONV_TYPE_ADD, CURR);
+                        logger->n_repl = 0;
                         result = SUB(D_L, D_R);
                     }
                 break;
@@ -106,12 +115,14 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
                 case OP_MUL:
                     {
                         LoggerLog(logger, CONV_TYPE_MUL, CURR);
+                        logger->n_repl = 0;
                         result = ADD(MUL(D_L, CP_R), MUL(CP_L, D_R));
                     }
                 break;
                 case OP_DIV:
                     {
                         LoggerLog(logger, CONV_TYPE_DIV, CURR);
+                        logger->n_repl = 0;
                         result = DIV(SUB(MUL(D_L, CP_R), MUL(CP_L, D_R)), MUL(CP_R, CP_R));
                     }
                 break;
@@ -119,12 +130,14 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
                 case OP_SIN:
                     {
                         LoggerLog(logger, CONV_TYPE_SIN, CURR);
+                        logger->n_repl = 0;
                         result = MUL(COS(CP_R), D_R);
                     }
                 break;
                 case OP_COS:
                     {
                         LoggerLog(logger, CONV_TYPE_COS, CURR);
+                        logger->n_repl = 0;
                         result = MUL(CREATE_NUM(-1), MUL(SIN(CP_R), D_R));
                     }
                 break;
@@ -133,21 +146,25 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
                     if (IS_NUM(LEFT) && IS_NUM(RIGHT))
                     {
                         LoggerLog(logger, CONV_TYPE_EXP_CONST_CONST, CURR);
+                        logger->n_repl = 0;
                         result = CREATE_NUM(0);
                     }
                     else if (IS_NUM(LEFT) && IS_FUNC(RIGHT))
                     {
                         LoggerLog(logger, CONV_TYPE_EXP_CONST_FUNC, CURR);
+                        logger->n_repl = 0;
                         result = MUL(EXP(CP_L, CP_R), MUL(LN(CP_L), D_R));
                     }
                     else if (IS_FUNC(LEFT) && IS_NUM(RIGHT))
                     {
                         LoggerLog(logger, CONV_TYPE_EXP_FUNC_CONST, CURR);
+                        logger->n_repl = 0;
                         result = MUL(CP_R, MUL(EXP(CP_L, CREATE_NUM(GET_NUM(RIGHT) - 1)), D_L));
                     }
                     else
                         {
                             LoggerLog(logger, CONV_TYPE_EXP_FUNC_FUNC, CURR);
+                            logger->n_repl = 0;
                             TreeNode *fict_node = EXP(CREATE_NUM(exp(1)), MUL(LN(CP_L), CP_R));  // TODO: e const
                             TreeNode *res = Differentiate(fict_node, logger);
                             TreeDtor(fict_node);
@@ -159,6 +176,7 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
                 case OP_LN:
                     {
                         LoggerLog(logger, CONV_TYPE_LN, CURR);
+                        logger->n_repl = 0;
                         result = MUL(DIV(CREATE_NUM(1), CP_R), D_R);
                     }
                 break;
@@ -169,6 +187,7 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
     }
 
     LoggerLog(logger, CONV_TYPE_RESULT, result);
+    logger->n_repl = 0;
     return result;
 }
 
@@ -182,7 +201,10 @@ void Simplify(TreeNode *node, Logger *logger)
     if (RIGHT)
         Simplify (RIGHT, logger);
 
+    TreeNodeUpdSize   (CURR);
+
     Rotate            (CURR);
+
     SimplifyConst     (CURR, logger);
     SimplifyNeutral   (CURR, logger);
 }
@@ -339,6 +361,8 @@ void SimplifyConst(TreeNode *node, Logger *logger)
             assert(0 && "Wrong operation");
     }
     
+    TreeNodeUpdSize(CURR);
+
     LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
@@ -424,28 +448,19 @@ void SimplifyNeutral(TreeNode *node, Logger *logger)
             }
     }
 
+    TreeNodeUpdSize(CURR);
+
     LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
 void Rotate(TreeNode *node)
 {
-    RotateSizeMin     (node);
     RotateCommutative (node);
 }
 
 void RotateCommutative(TreeNode *node)
 {
     if ((IS_OP_CODE(CURR, OP_ADD) || IS_OP_CODE(CURR, OP_MUL)) && IS_NUM(RIGHT))
-    {
-        TreeNode *buf   = LEFT;
-                  LEFT  = RIGHT;
-                  RIGHT = buf;
-    }
-}
-
-void RotateSizeMin(TreeNode *node)
-{
-    if (LEFT->size > RIGHT->size)
     {
         TreeNode *buf   = LEFT;
                   LEFT  = RIGHT;

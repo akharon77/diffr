@@ -23,6 +23,7 @@ int main(int argc, const char *argv[])
 
     Diffr diffr = {};
 
+    DiffrCtor(&diffr);
     DiffrInput(&diffr, "test.txt", &err);
     DiffrDump(&diffr);
 

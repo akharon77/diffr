@@ -34,14 +34,16 @@ TreeNode   *DiffrParse          (int32_t pos, int32_t *end_pos, TextInfo *text);
 void        DiffrDump           (Diffr *diffr);
 void        DumpToFile          (TreeNode *node, int32_t fd, int64_t idx);
 
-TreeNode*   Differentiate       (TreeNode *node, Logger *logger);
+TreeNode   *Differentiate       (TreeNode *node, Logger *logger);
 
 void        Simplify            (TreeNode *node, Logger *logger);
 
 void        SimplifyConst       (TreeNode *node, Logger *logger);
 void        SimplifyNeutral     (TreeNode *node, Logger *logger);
 
+void        Rotate              (TreeNode *node);
 void        RotateCommutative   (TreeNode *node);
+void        RotateSizeMin       (TreeNode *node);
 
 const char *GetOperatorString   (int32_t op_code);
 int32_t     GetOperatorPriority (int32_t op_code);

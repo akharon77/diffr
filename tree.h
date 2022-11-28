@@ -15,6 +15,9 @@ TreeNode *TreeCopy         (TreeNode *node);
 
 bool      TreeNodeIsLeaf   (TreeNode *node);
 void      TreeNodeAddChild (TreeNode *node, TreeNode *child);
+TreeNode *GetMaxSubtree    (TreeNode *node);
+int       TreeNodeGetSize  (TreeNode *node);
+void      TreeNodeUpdSize  (TreeNode *node);
 
 #endif  // TREE_H
 

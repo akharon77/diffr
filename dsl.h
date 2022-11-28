@@ -3,7 +3,10 @@
 
 #define NUM_CTOR(node, val)         TreeNodeCtor   (node,     NODE_TYPE_NUM, {.dbl = val}, NULL, NULL)
 #define CREATE_NUM(val)             CreateTreeNode (          NODE_TYPE_NUM, {.dbl = val}, NULL, NULL)
+
 #define OP_CTOR(node, op, lhs, rhs) TreeNodeCtor   (node,     NODE_TYPE_OP,  {.op  = op},  lhs,  rhs)
+
+#define VAR_CTOR(node, val)             TreeNodeCtor (node, NODE_TYPE_VAR, {.var = strdup(val)}, NULL, NULL)
 
 #define LEFT                        (CURR)->left
 #define RIGHT                       (CURR)->right
@@ -38,6 +41,11 @@
                                      (val) - EPS < GET_NUM(node) && \
                                      GET_NUM(node) < (val) + EPS)
 
+#define IS_EQ_NODE(lhs, rhs)        (IS_NUM(lhs) && IS_NUM(rhs) && IS_EQ(lhs, GET_NUM(rhs)) ||  \
+                                     IS_VAR(lhs) && IS_VAR(rhs) &&                              \
+                                     strcasecmp(GET_VAR(lhs), GET_VAR(rhs)) == 0            ||  \
+                                     IS_OP(lhs) && IS_OP(rhs) && IS_OP_CODE(lhs, GET_OP(rhs)))
+
 #define IS_ZERO(node)               (IS_EQ(node, 0))
 #define IS_ONE(node)                (IS_EQ(node, 1))
 
@@ -48,6 +56,6 @@
 #define GET_TYPE(node)              ((node)->type)
 #define GET_NUM(node)               ((node)->value.dbl)
 #define GET_OP(node)                ((node)->value.op)
-#define GET_VAR(nodr)               ((node)->value.var)
+#define GET_VAR(node)               ((node)->value.var)
 
 #endif  // DSL_H
