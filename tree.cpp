@@ -20,8 +20,6 @@ void TreeDtor(TreeNode *node)
     free(CURR);
 }
 
-#undef CURR
-
 TreeNode *TreeNodeNew()
 {
     TreeNode *res = (TreeNode*) calloc(1, sizeof(TreeNode));
@@ -29,8 +27,6 @@ TreeNode *TreeNodeNew()
 
     return res;
 }
-
-#define CURR node
 
 TreeNode *TreeCopy(TreeNode *node)
 {
@@ -69,6 +65,7 @@ void   TreeNodeCtor(TreeNode *node, int32_t type, TreeNodeValue value, TreeNode 
         {
             .type  = type,
             .value = value,
+            .size  = (left ? left->size : 0) + (right ? right->size : 0) + 1,
             .left  = left,
             .right = right 
         };
@@ -81,5 +78,15 @@ TreeNode *CreateTreeNode(int32_t type, TreeNodeValue val, TreeNode *left, TreeNo
     TreeNodeCtor(node, type, val, left, right);
 
     return node;
+}
+
+bool CompareTree(TreeNode *left, TreeNode *right)
+{
+    if (left == NULL && right == NULL)
+        return true;
+    else if (left == NULL || right == NULL)
+        return false;
+
+    return *left == *right && CompareTree(left->left, right->left) && CompareTree(left->right, right->right);
 }
 

@@ -4,16 +4,17 @@
 #include <stdint.h>
 #include "tree_struct.h"
 
-void   TreeCtor     (TreeNode *node);
-void   TreeDtor     (TreeNode *node);
+void      TreeCtor         (TreeNode *node);
+void      TreeDtor         (TreeNode *node);
 
-void   TreeNodeCtor     (TreeNode *node, int32_t type, TreeNodeValue value, TreeNode *left, TreeNode *right);
-TreeNode  *CreateTreeNode   (int32_t type, TreeNodeValue val, TreeNode *left, TreeNode *right);
-TreeNode  *TreeNodeNew      ();
-void   TreeNodeAddChild (TreeNode *node, TreeNode *child);
-TreeNode  *TreeCopy     (TreeNode *node);
+TreeNode *TreeNodeNew      ();
+void      TreeNodeCtor     (TreeNode *node, int32_t type, TreeNodeValue value, TreeNode *left, TreeNode *right);
 
-bool   TreeNodeIsLeaf   (TreeNode *node);
+TreeNode *CreateTreeNode   (int32_t type, TreeNodeValue val, TreeNode *left, TreeNode *right);
+TreeNode *TreeCopy         (TreeNode *node);
+
+bool      TreeNodeIsLeaf   (TreeNode *node);
+void      TreeNodeAddChild (TreeNode *node, TreeNode *child);
 
 #endif  // TREE_H
 

@@ -182,7 +182,7 @@ void Simplify(TreeNode *node, Logger *logger)
     if (RIGHT)
         Simplify (RIGHT, logger);
 
-    RotateCommutative (CURR);
+    Rotate            (CURR);
     SimplifyConst     (CURR, logger);
     SimplifyNeutral   (CURR, logger);
 }
@@ -427,9 +427,25 @@ void SimplifyNeutral(TreeNode *node, Logger *logger)
     LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
+void Rotate(TreeNode *node)
+{
+    RotateSizeMin     (node);
+    RotateCommutative (node);
+}
+
 void RotateCommutative(TreeNode *node)
 {
     if ((IS_OP_CODE(CURR, OP_ADD) || IS_OP_CODE(CURR, OP_MUL)) && IS_NUM(RIGHT))
+    {
+        TreeNode *buf   = LEFT;
+                  LEFT  = RIGHT;
+                  RIGHT = buf;
+    }
+}
+
+void RotateSizeMin(TreeNode *node)
+{
+    if (LEFT->size > RIGHT->size)
     {
         TreeNode *buf   = LEFT;
                   LEFT  = RIGHT;

@@ -131,9 +131,10 @@ int32_t GetOperatorPriority(int32_t op_code)
             return 1;
         case OP_SIN:
         case OP_COS:
-        case OP_EXP:
         case OP_LN:
             return 2;
+        case OP_EXP:
+            return 3;
     }
 }
 

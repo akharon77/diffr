@@ -154,13 +154,10 @@ const char *GetVariable(const char *str, TreeNode *value)
 
     assert(str != str_old);
 
-    *value = 
-        {
-            .type  = NODE_TYPE_VAR,
-            .value = {.var = strndup(str_old, str - str_old)},
-            .left  = NULL,
-            .right = NULL
-        };
+    TreeNodeCtor(value,
+                 NODE_TYPE_VAR,
+                 {.var = strndup(str_old, str - str_old)},
+                 NULL, NULL);
 
     return str;
 }

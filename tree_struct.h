@@ -14,6 +14,8 @@ struct TreeNode
 
     TreeNodeValue value;
 
+    int32_t size;
+
     TreeNode *left;
     TreeNode *right;
 };

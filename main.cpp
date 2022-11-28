@@ -33,7 +33,7 @@ int main(int argc, const char *argv[])
     {
         char str[1024] = "";
         LoggerPrintToStrLatex(&diffr.logger, str, i);
-        printf("%s \n \\\\ \n\n", str);
+        printf("$%s$ \n \\\\ \n\n", str);
     }
     
     DiffrDtor(&diffr);
