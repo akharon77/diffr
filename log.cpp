@@ -39,7 +39,7 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
         Rotate(node_cpy);
         
         node->size -= LEFT->size;
-
+// останоновился на замене поддеревьев по размеру
         TreeDtor(node_cpy->left);
         CreateTreeNode(NODE_TYPE_VAR, {.var = GetGreekAlphabet(logger->n_repl++)}, NULL, NULL);
 
