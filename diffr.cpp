@@ -47,7 +47,7 @@ void DiffrRun(Diffr *diffr)
 
     // diffr->logger.n_repl = 0;
 
-    // Simplify(diffr->root, &diffr->logger);
+    Simplify(diffr->root, &diffr->logger);
 
     // diffr->logger.n_repl = 0;
 }
@@ -76,8 +76,6 @@ void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
 TreeNode* Differentiate(TreeNode *node, Logger *logger)
 {
     ASSERT(node != NULL);
-
-    Simplify(node);
 
     TreeNode *result = NULL;
 
@@ -192,7 +190,7 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
             ASSERT(0);
     }
 
-    Simplify(result);
+    Simplify(result, logger);
 
     LoggerLog(logger, CONV_TYPE_RESULT, result);
 
@@ -202,18 +200,20 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
 
 #undef DFR
 
-void Simplify(TreeNode *node)
+void Simplify(TreeNode *node, Logger *logger)
 {
     Rotate            (CURR);
-    SimplifyConst     (CURR);
-    SimplifyNeutral   (CURR);
+    SimplifyConst     (CURR, logger);
+    SimplifyNeutral   (CURR, logger);
 }
 
-void SimplifyConst(TreeNode *node)
+void SimplifyConst(TreeNode *node, Logger *logger)
 {
     if (IS_VAR(CURR) || IS_NUM(CURR))
         return;
     
+    LoggerLog(logger, CONV_TYPE_SIMP_CONST, CURR);
+
     switch (GET_OP(CURR))
     {
         case OP_ADD:
@@ -360,12 +360,16 @@ void SimplifyConst(TreeNode *node)
     }
     
     TreeNodeUpdSize(CURR);
+
+    LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
-void SimplifyNeutral(TreeNode *node)
+void SimplifyNeutral(TreeNode *node, Logger *logger)
 {
     if (IS_NUM(CURR) || IS_VAR(CURR))
         return;
+
+    LoggerLog(logger, CONV_TYPE_SIMP_NEUT, CURR);
 
     switch (GET_OP(CURR))
     {
@@ -443,6 +447,8 @@ void SimplifyNeutral(TreeNode *node)
     }
 
     TreeNodeUpdSize(CURR);
+
+    LoggerLog(logger, CONV_TYPE_RESULT, CURR);
 }
 
 void Rotate(TreeNode *node)

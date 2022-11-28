@@ -36,10 +36,10 @@ void        DumpToFile          (TreeNode *node, int32_t fd, int64_t idx);
 
 TreeNode   *Differentiate       (TreeNode *node, Logger *logger);
 
-void        Simplify            (TreeNode *node);
+void        Simplify            (TreeNode *node, Logger *logger);
 
-void        SimplifyConst       (TreeNode *node);
-void        SimplifyNeutral     (TreeNode *node);
+void        SimplifyConst       (TreeNode *node, Logger *logger);
+void        SimplifyNeutral     (TreeNode *node, Logger *logger);
 
 void        Rotate              (TreeNode *node);
 void        RotateCommutative   (TreeNode *node);
