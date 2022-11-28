@@ -29,18 +29,21 @@ void LoggerDtor(Logger *logger)
 
 void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
 {
-    if (node->size > MAX_TREE_SIZE)
-    {
-        TreeNode *max_subtree = GetMaxSubtree(node);
+    TreeNode *node_cpy = TreeCopy(node);
+    printf("\n");
 
-        node->size -= max_subtree->size;
+    if (node_cpy->size > MAX_TREE_SIZE)
+    {
+        TreeNode *max_subtree = GetMaxSubtree(node_cpy);
+
+        node_cpy->size -= max_subtree->size;
         LoggerReplace(logger, max_subtree);
 
-        if (node->size > MAX_TREE_SIZE)
+        if (node_cpy->size > MAX_TREE_SIZE)
         {
-            max_subtree = GetMaxSubtree(node);
+            max_subtree = GetMaxSubtree(node_cpy);
 
-            node->size -= max_subtree->size;
+            node_cpy->size -= max_subtree->size;
             LoggerReplace(logger, max_subtree);
         }
     }
@@ -48,18 +51,17 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
     StackPush(&logger->convs, 
               {
                   .type = type, 
-                  .node = TreeCopy(node) 
+                  .node = node_cpy
               });
 
     TreeNode *buf = ((Diffr*) logger->diffr)->root;
-    ((Diffr*) logger->diffr)->root = node;
+    ((Diffr*) logger->diffr)->root = node_cpy;
     DiffrDump((Diffr*) logger->diffr);
     ((Diffr*) logger->diffr)->root = buf;
 }
 
 void LoggerPrintToStrLatex(Logger *log, char *str, int32_t id)
 {
-    printf("type: %d, \n", log->convs.data[id].type);
     PrintToStrLatex(log->convs.data[id].node, str);
 }
 
