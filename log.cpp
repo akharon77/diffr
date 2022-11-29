@@ -61,12 +61,44 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
 
 void LoggerGenerateToFdLatexBook(Logger *logger, int32_t fd)
 {
+    dprintf(fd, "\\documentclass[12pt, letterpaper]{book}\n"
+
+                "\\usepackage[utf8]{inputenc}\n"
+                "\\usepackage{amsmath}\n"
+                "\\usepackage{amsfonts}\n"
+                "\\usepackage{mathtools}\n"
+                "\\usepackage{amssymb}\n"
+                "\\usepackage{extarrows}\n"
+
+                "\\usepackage{graphicx}\n"
+                "\\usepackage{graphics}\n"
+                "\\usepackage{fancyhdr}\n"
+
+                "\\pagestyle{fancy}\n"
+
+                "\\begin{document}\n"
+
+                "\\title{Differentiating functions}\n"
+                "\\author{Abdullin Timur Arturovich}\n"
+
+                "\\maketitle\n"
+
+                "\\tableofcontents\n");
+
     for (int32_t i = 0; i < logger->convs.size; ++i)
         LoggerPrintToFdLatex(logger, fd, i);
+
+    dprintf(fd, "\\end{document}\n");
+}
+
+const char *GetRandomComment()
+{
+    return "Ba!";
 }
 
 void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
 {
+    dprintf(fd, "\\textbf{\n");
     dprintf(fd, "%s\n", GetRandomComment());
 
     switch (logger->convs.data[id].type)
@@ -80,13 +112,15 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
         case CONV_TYPE_SIMP_CONST:
         case CONV_TYPE_SIMP_NEUT:
             dprintf(fd, "Let's try to simplify");
+            break;
         default:
             dprintf(fd, "Let's  use the rule of differentiating %s", GetConvDesc(logger->convs.data[id].type));
     }
-    dprintf(fd, ":\n");
+    dprintf(fd, ":\n}\n");
 
-    PrintToStrLatex(logger->convs.data[id].node, fd);
-    dprintf(fd, "\n");
+    dprintf(fd, "$");
+    PrintToFdLatex(logger->convs.data[id].node, fd);
+    dprintf(fd, "$\n");
 }
 
 #define WRAP_PRINT(node)                                                                            \
@@ -132,7 +166,7 @@ void PrintToFdLatex(TreeNode *node, int32_t fd)
 
                 WRAP_PRINT(LEFT);
 
-                dprintf(fd, "%s%n", GetOperatorStringLatex(GET_OP(CURR)));
+                dprintf(fd, "%s", GetOperatorStringLatex(GET_OP(CURR)));
 
                 WRAP_PRINT(RIGHT);
             }

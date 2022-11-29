@@ -26,6 +26,7 @@ struct Diffr
 {
     char     *filename;
 
+    Logger    logger;
     TreeNode *root;
 };
 

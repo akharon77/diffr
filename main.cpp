@@ -30,7 +30,7 @@ int main(int argc, const char *argv[])
     DiffrRun(&diffr);
     DiffrDump(&diffr);
 
-
+    LoggerGenerateToFdLatexBook(&diffr.logger, 1);
     
     DiffrDtor(&diffr);
 
