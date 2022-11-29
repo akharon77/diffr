@@ -14,7 +14,6 @@ void LoggerCtor(Logger *logger, Diffr *diffr)
 
     logger->n_repl   = 0;
 
-    logger->diffr    = (void*) diffr;
     logger->filename = strdup(diffr->filename);
 }
 
@@ -54,15 +53,40 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
                   .node = node_cpy
               });
 
-    TreeNode *buf = ((Diffr*) logger->diffr)->root;
-    ((Diffr*) logger->diffr)->root = node_cpy;
-    DiffrDump((Diffr*) logger->diffr);
-    ((Diffr*) logger->diffr)->root = buf;
+    // TreeNode *buf = ((Diffr*) logger->diffr)->root;
+    // ((Diffr*) logger->diffr)->root = node_cpy;
+    // DiffrDump((Diffr*) logger->diffr);
+    // ((Diffr*) logger->diffr)->root = buf;
 }
 
-void LoggerPrintToStrLatex(Logger *log, char *str, int32_t id)
+void LoggerGenerateToFdLatexBook(Logger *logger, int32_t fd)
 {
-    PrintToStrLatex(log->convs.data[id].node, str);
+    for (int32_t i = 0; i < logger->convs.size; ++i)
+        LoggerPrintToFdLatex(logger, fd, i);
+}
+
+void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
+{
+    dprintf(fd, "%s\n", GetRandomComment());
+
+    switch (logger->convs.data[id].type)
+    {
+        case CONV_TYPE_REPL:
+            dprintf(fd, "Let's introduce the replacement of the expression with a variable");
+            break;
+        case CONV_TYPE_RESULT:
+            dprintf(fd, "We got this result");
+            break;
+        case CONV_TYPE_SIMP_CONST:
+        case CONV_TYPE_SIMP_NEUT:
+            dprintf(fd, "Let's try to simplify");
+        default:
+            dprintf(fd, "Let's  use the rule of differentiating %s", GetConvDesc(logger->convs.data[id].type));
+    }
+    dprintf(fd, ":\n");
+
+    PrintToStrLatex(logger->convs.data[id].node, fd);
+    dprintf(fd, "\n");
 }
 
 #define WRAP_PRINT(node)                                                                            \
@@ -71,67 +95,44 @@ do                                                                              
     if (node)                                                                                       \
     {                                                                                               \
         if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
-        {                                                                                           \
-            sprintf(str, "\\left(");                                                                \
-            str += 6;                                                                               \
-        }                                                                                           \
+            dprintf(fd, "\\left(");                                                                 \
                                                                                                     \
-        str = PrintToStrLatex(node, str);                                                           \
+        PrintToFdLatex(node, fd);                                                                   \
                                                                                                     \
         if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
-        {                                                                                           \
-            sprintf(str, "\\right)");                                                               \
-            str += 7;                                                                               \
-        }                                                                                           \
+            dprintf(fd, "\\right)");                                                                \
     }                                                                                               \
 }                                                                                                   \
 while (0)
 
-char *PrintToStrLatex(TreeNode *node, char *str)
+void PrintToFdLatex(TreeNode *node, int32_t fd)
 {
-    int32_t offset = 0;
-
-    sprintf(str, "{");
-    ++str;
+    dprintf(fd, "{");
 
     switch (GET_TYPE(CURR))
     {
         case NODE_TYPE_NUM:
             {
                 if (GET_NUM(CURR) < -EPS)
-                {
-                    sprintf(str, "(");
-                    ++str;
-                }
+                    dprintf(fd, "(");
 
-                sprintf(str, "%lg%n", GET_NUM(CURR), &offset);
-                str += offset;
+                dprintf(fd, "%lg", GET_NUM(CURR));
 
                 if (GET_NUM(CURR) < -EPS)
-                {
-                    sprintf(str, ")");
-                    ++str;
-                }
+                    dprintf(fd, ")");
             }
             break;
         case NODE_TYPE_VAR:
-            {
-                sprintf(str, "%s%n", GET_VAR(CURR), &offset);
-                str += offset;
-            }
+            dprintf(fd, "%s", GET_VAR(CURR));
             break;
         case NODE_TYPE_OP:
             {
                 if (GET_OP(CURR) == OP_DIV)
-                {
-                    sprintf(str, "\\cfrac");
-                    str += 6;
-                }
+                    dprintf(fd, "\\cfrac");
 
                 WRAP_PRINT(LEFT);
 
-                sprintf(str, "%s%n", GetOperatorStringLatex(GET_OP(CURR)), &offset);
-                str += offset;
+                dprintf(fd, "%s%n", GetOperatorStringLatex(GET_OP(CURR)));
 
                 WRAP_PRINT(RIGHT);
             }
@@ -140,10 +141,7 @@ char *PrintToStrLatex(TreeNode *node, char *str)
             ASSERT(0);
     }
 
-    sprintf(str, "}");
-    ++str;
-
-    return str;
+    dprintf(fd, "}");
 }
 
 #undef CURR
