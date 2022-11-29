@@ -212,7 +212,10 @@ const char *GetGreekAlphabet(int32_t id)
             "\\Rho"
         };
 
-    return latex_greek[id];
+    static char res_var[512] = "";
+
+    sprintf(res_var, "{%s}_{%d}", latex_greek[id % 30], id / 30);
+    return res_var;
 }
 
 void LoggerReplace(Logger *logger, TreeNode *node)

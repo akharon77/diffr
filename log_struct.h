@@ -6,7 +6,7 @@
 #include "stack_struct.h"
 
 const int32_t REPL_SIZE            = 26;
-const int32_t MAX_TREE_SIZE        = 50;
+const int32_t MAX_TREE_SIZE        = 20;
 const int32_t LOGGER_STK_SIZE_BASE = 64;
 
 enum CONV_TYPES
