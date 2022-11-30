@@ -58,7 +58,7 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
     // ((Diffr*) logger->diffr)->root = buf;
 }
 
-void LoggerGenerateToFdLatexBook(Logger *logger, int32_t fd)
+void GenerateToFdLatexBook(Logger *logger, int32_t fd)
 {
     dprintf(fd, "\\documentclass[12pt, letterpaper]{book}\n"
 
@@ -100,6 +100,12 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
 
     switch (logger->convs.data[id].type)
     {
+        case CONV_TYPE_RESULT_N_DF:
+            dprintf(fd, "We got the next derivative of the function");
+            break;
+        case CONV_TYPE_RESULT_TAYLOR:
+            dprintf(fd, "We got Taylor series expansion");
+            break;
         case CONV_TYPE_REPL:
             dprintf(fd, "Let's introduce the replacement of the expression with a variable");
             break;
@@ -176,8 +182,6 @@ void PrintToFdLatex(TreeNode *node, int32_t fd)
 
     dprintf(fd, "}");
 }
-
-#undef CURR
 
 const char *GetConvDesc(int32_t type)
 {
@@ -257,10 +261,16 @@ void LoggerReplace(Logger *logger, TreeNode *node)
 {
     LoggerLog(logger, CONV_TYPE_REPL, node);
 
-    TreeDtor(node->left);
-    TreeDtor(node->right);
+    if (LEFT)
+        TreeDtor(node->left);
+
+    if (RIGHT)
+        TreeDtor(node->right);
+
     VAR_CTOR(node, GetGreekAlphabet(logger->n_repl++));
     
     LoggerLog(logger, CONV_TYPE_RESULT, node);
 }
+
+#undef CURR
 

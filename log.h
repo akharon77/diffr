@@ -14,7 +14,7 @@ const char *GetRandomComment();
 const char *GetConvDesc                 (int32_t type);
 const char *GetGreekAlphabet            (int32_t id);
 
-void        LoggerGenerateToFdLatexBook (Logger *logger, int32_t fd);
+void        GenerateToFdLatexBook       (Logger *logger, int32_t fd);
 void        LoggerPrintToFdLatex        (Logger *logger, int32_t fd, int32_t id);
 void        PrintToFdLatex              (TreeNode *node, int32_t fd);
 

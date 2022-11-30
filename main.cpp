@@ -11,7 +11,7 @@ int32_t main(int32_t argc, const char *argv[])
     int32_t err = 0;
 
     int32_t run_mode = HELP_OPTION;
-    int32_t df_n  = 6;
+    int32_t df_n  = 3;
     double  df_x0 = 0;
 
     const char *filename = "formula.txt";
@@ -55,7 +55,7 @@ int32_t main(int32_t argc, const char *argv[])
     DiffrDump(&diffr);
 
     int32_t fd = creat("output.tex", S_IRWXU);
-    LoggerGenerateToFdLatexBook(&diffr.logger, fd);
+    GenerateToFdLatexBook(&diffr.logger, fd);
     close(fd);
     
     DiffrDtor(&diffr);
