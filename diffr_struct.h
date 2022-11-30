@@ -28,6 +28,9 @@ struct Diffr
 
     Logger    logger;
     TreeNode *root;
+
+    double    df_x0;
+    int32_t   df_n;
 };
 
 #endif  // DIFFR_STRUCT_H

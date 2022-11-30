@@ -17,12 +17,16 @@
 
 const Option EXEC_OPTIONS[] = 
     {
+        {"--file",     "-f",  FILENAME_OPTION, "from file"},
+        {"--df",       "-d",  DF_OPTION,       "df"},
+        {"--dfn",      "-n",  DF_N_OPTION,     "n"},
+        {"--dfx0",     "-x",  DF_X0_OPTION,    "x0"},
         {"--help",     "-h",  HELP_OPTION,     "show help"}
     };
  
 const size_t N_EXEC_OPTIONS = sizeof(EXEC_OPTIONS) / sizeof(Option);
 
-void DiffrCtor(Diffr *diffr, int32_t df_n)
+void DiffrCtor(Diffr *diffr, double df_x0, int32_t df_n)
 {
     ASSERT(diffr != NULL);
 
@@ -42,7 +46,7 @@ void DiffrDtor(Diffr *diffr)
 
 void DiffrRun(Diffr *diffr)
 {
-    TaylorSeries(diffr->root, df_x0, df_n, &diffr->logger);
+    TaylorSeries(diffr->root, diffr->df_x0, diffr->df_n, &diffr->logger);
 }
 
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)

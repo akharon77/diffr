@@ -10,11 +10,11 @@
 
 enum OPTIONS
 {
-    DB_FILE_OPTION,
     HELP_OPTION,
-    PREDICT_OPTION,
-    COMPARE_OPTION,
-    DESCRIBE_OPTION,
+    FILENAME_OPTION,
+    DF_OPTION,
+    DF_N_OPTION,
+    DF_X0_OPTION,
     N_OPTIONS
 };
 
@@ -23,7 +23,7 @@ extern const size_t       N_EXEC_OPTIONS;
 
 const int32_t MAX_STR_OBJ_LEN = 128;
 
-void        DiffrCtor           (Diffr *diffr);
+void        DiffrCtor           (Diffr *diffr, double df_x0, int32_t df_n);
 void        DiffrDtor           (Diffr *diffr);
 
 void        DiffrRun            (Diffr *diffr);
