@@ -30,7 +30,9 @@ int main(int argc, const char *argv[])
     DiffrRun(&diffr);
     DiffrDump(&diffr);
 
-    LoggerGenerateToFdLatexBook(&diffr.logger, 1);
+    int32_t fd = creat(filename, S_IRWXU);
+    LoggerGenerateToFdLatexBook(&diffr.logger, fd);
+    close(fd);
     
     DiffrDtor(&diffr);
 

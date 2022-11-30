@@ -35,9 +35,11 @@ void        DiffrDump           (Diffr *diffr);
 void        DumpToFile          (TreeNode *node, int32_t fd, int64_t idx);
 
 TreeNode   *Differentiate       (TreeNode *node, Logger *logger);
+TreeNode   *TaylorSeries        (TreeNode *node, double x0, int32_t n, Logger *logger);
+
+double      Evaluate            (TreeNode *node, double x, Logger *logger);
 
 void        Simplify            (TreeNode *node, Logger *logger);
-
 void        SimplifyConst       (TreeNode *node, Logger *logger);
 void        SimplifyNeutral     (TreeNode *node, Logger *logger);
 

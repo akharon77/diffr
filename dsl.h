@@ -1,12 +1,13 @@
 #ifndef DSL_H
 #define DSL_H
 
-#define NUM_CTOR(node, val)         TreeNodeCtor   (node,     NODE_TYPE_NUM, {.dbl = val}, NULL, NULL)
-#define CREATE_NUM(val)             CreateTreeNode (          NODE_TYPE_NUM, {.dbl = val}, NULL, NULL)
+#define NUM_CTOR(node, val)         TreeNodeCtor   (node,     NODE_TYPE_NUM, {.dbl = val},         NULL, NULL)
+#define CREATE_NUM(val)             CreateTreeNode (          NODE_TYPE_NUM, {.dbl = val},         NULL, NULL)
 
-#define OP_CTOR(node, op, lhs, rhs) TreeNodeCtor   (node,     NODE_TYPE_OP,  {.op  = op},  lhs,  rhs)
+#define OP_CTOR(node, op, lhs, rhs) TreeNodeCtor   (node,     NODE_TYPE_OP,  {.op  = op},          lhs,  rhs)
 
-#define VAR_CTOR(node, val)             TreeNodeCtor (node, NODE_TYPE_VAR, {.var = strdup(val)}, NULL, NULL)
+#define VAR_CTOR(node, val)         TreeNodeCtor   (node,     NODE_TYPE_VAR, {.var = strdup(val)}, NULL, NULL)
+#define CREATE_VAR(val)             CreateTreeNode (          NODE_TYPE_VAR, {.var = strdup(val)}, NULL, NULL)
 
 #define LEFT                        (CURR)->left
 #define RIGHT                       (CURR)->right

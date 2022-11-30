@@ -29,7 +29,6 @@ void LoggerDtor(Logger *logger)
 void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
 {
     TreeNode *node_cpy = TreeCopy(node);
-    printf("\n");
 
     if (node_cpy->size > MAX_TREE_SIZE)
     {
@@ -83,12 +82,8 @@ void LoggerGenerateToFdLatexBook(Logger *logger, int32_t fd)
 
                 "\\maketitle\n");
 
-    dprintf(fd, "\\chapter{df/dx}\n");
-
     for (int32_t i = 0; i < logger->convs.size; ++i)
         LoggerPrintToFdLatex(logger, fd, i);
-
-    dprintf(fd, "\\chapter{df/dx}\n");
 
     dprintf(fd, "\\end{document}\n");
 }

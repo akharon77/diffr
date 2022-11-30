@@ -40,7 +40,7 @@ void DiffrDtor(Diffr *diffr)
 
 void DiffrRun(Diffr *diffr)
 {
-    TreeNode *df_node = Differentiate(diffr->root, &diffr->logger);
+    TreeNode *df_node = TaylorSeries(diffr->root, 0, 3, &diffr->logger);
 
     TreeDtor(diffr->root);
     diffr->root = df_node;
@@ -195,12 +195,15 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
 
 void Simplify(TreeNode *node, Logger *logger)
 {
+    if (LEFT)
+        Simplify(LEFT,  logger);
+    if (RIGHT)
+        Simplify(RIGHT, logger);
+
     Rotate            (CURR);
 
     SimplifyConst     (CURR, logger);
     SimplifyNeutral   (CURR, logger);
-
-    TreeNodeUpdSize   (CURR);
 }
 
 void SimplifyConst(TreeNode *node, Logger *logger)
@@ -411,7 +414,7 @@ void SimplifyNeutral(TreeNode *node, Logger *logger)
                 free(RIGHT);
 
                 TreeNode *last_left =  LEFT;
-                     *CURR      = *LEFT;
+                         *CURR      = *LEFT;
 
                 free(last_left);
             }
@@ -462,4 +465,72 @@ void RotateCommutative(TreeNode *node)
     }
 }
 
+TreeNode *TaylorSeries(TreeNode *node, double x0, int32_t n, Logger *logger)
+{
+    TreeNode *result = CREATE_NUM(0);
+    TreeNode *df     = TreeCopy(node);
+    double    fac    = 1;
+
+    for (int32_t i = 0; i < n + 1; ++i)
+    {
+        TreeNode *mid_res = ADD(TreeCopy(result), MUL(DIV(CREATE_NUM(Evaluate(df, x0, logger)), CREATE_NUM(fac)), EXP(SUB(CREATE_VAR("x"), CREATE_NUM(x0)), CREATE_NUM(i))));
+
+        TreeNode *next_df = Differentiate(df, logger);
+
+        TreeDtor(df);
+        TreeDtor(result);
+
+        df      = next_df;
+        result  = mid_res;
+        fac    *= i + 1;
+
+        Simplify(result, logger);
+
+        LoggerLog(logger, CONV_TYPE_RESULT_N_DF, df);
+    }
+
+    LoggerLog(logger, CONV_TYPE_RESULT_TAYLOR, result);
+    return result;
+}
+
+double Evaluate(TreeNode *node, double x, Logger *logger)
+{
+    double lhs = 0;
+    double rhs = 0;
+
+    if (LEFT)
+        lhs = Evaluate(LEFT,  x, logger);
+    if (RIGHT)
+        rhs = Evaluate(RIGHT, x, logger);
+
+    switch (GET_TYPE(CURR))
+    {
+        case NODE_TYPE_NUM:
+            return GET_NUM(CURR);
+        case NODE_TYPE_VAR:
+            return x;
+        case NODE_TYPE_OP:
+            switch (GET_OP(CURR))
+            {
+                case OP_ADD:
+                    return lhs + rhs;
+                case OP_SUB:
+                    return lhs - rhs;
+                case OP_MUL:
+                    return lhs * rhs;
+                case OP_DIV:
+                    return lhs / rhs;
+                case OP_SIN:
+                    return sin(rhs);
+                case OP_COS:
+                    return cos(rhs);
+                case OP_EXP:
+                    return exp(log(lhs) * rhs);
+                case OP_LN:
+                    return log(rhs);
+            }
+    }
+}
+
 #undef CURR
+
