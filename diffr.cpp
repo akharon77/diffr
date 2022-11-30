@@ -44,8 +44,6 @@ void DiffrRun(Diffr *diffr)
 
     TreeDtor(diffr->root);
     diffr->root = df_node;
-
-    Simplify(diffr->root, &diffr->logger);
 }
 
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
@@ -186,6 +184,8 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
             ASSERT(0);
     }
 
+    Simplify(result, logger);
+
     LoggerLog(logger, CONV_TYPE_RESULT, result);
     // logger->n_repl = 0;
     return result;
@@ -195,18 +195,12 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
 
 void Simplify(TreeNode *node, Logger *logger)
 {
-    if (LEFT)
-        Simplify (LEFT,  logger);
-
-    if (RIGHT)
-        Simplify (RIGHT, logger);
-
-    TreeNodeUpdSize   (CURR);
-
     Rotate            (CURR);
 
     SimplifyConst     (CURR, logger);
     SimplifyNeutral   (CURR, logger);
+
+    TreeNodeUpdSize   (CURR);
 }
 
 void SimplifyConst(TreeNode *node, Logger *logger)

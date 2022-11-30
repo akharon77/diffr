@@ -81,12 +81,14 @@ void LoggerGenerateToFdLatexBook(Logger *logger, int32_t fd)
                 "\\title{Differentiating functions}\n"
                 "\\author{Abdullin Timur Arturovich}\n"
 
-                "\\maketitle\n"
+                "\\maketitle\n");
 
-                "\\tableofcontents\n");
+    dprintf(fd, "\\chapter{df/dx}\n");
 
     for (int32_t i = 0; i < logger->convs.size; ++i)
         LoggerPrintToFdLatex(logger, fd, i);
+
+    dprintf(fd, "\\chapter{df/dx}\n");
 
     dprintf(fd, "\\end{document}\n");
 }
@@ -110,17 +112,19 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
             dprintf(fd, "We got this result");
             break;
         case CONV_TYPE_SIMP_CONST:
+            dprintf(fd, "Let's try to simplify constants");
+            break;
         case CONV_TYPE_SIMP_NEUT:
-            dprintf(fd, "Let's try to simplify");
+            dprintf(fd, "Let's try to simplify neutral elements");
             break;
         default:
             dprintf(fd, "Let's  use the rule of differentiating %s", GetConvDesc(logger->convs.data[id].type));
     }
-    dprintf(fd, ":\n}\n");
+    dprintf(fd, ":\n}\n\n");
 
-    dprintf(fd, "$");
+    dprintf(fd, "\\begin{center}\n$");
     PrintToFdLatex(logger->convs.data[id].node, fd);
-    dprintf(fd, "$\n");
+    dprintf(fd, "$\n\\end{center}\n\n");
 }
 
 #define WRAP_PRINT(node)                                                                            \
@@ -205,6 +209,10 @@ const char *GetConvDesc(int32_t type)
             return "power function";
         case CONV_TYPE_EXP_FUNC_FUNC:
             return "complex exponential function";
+        case CONV_TYPE_LN:
+            return "logarithmic function";
+        default:
+            return "(null)";
     }
 }
 
