@@ -22,10 +22,12 @@ const Option EXEC_OPTIONS[] =
  
 const size_t N_EXEC_OPTIONS = sizeof(EXEC_OPTIONS) / sizeof(Option);
 
-void DiffrCtor(Diffr *diffr)
+void DiffrCtor(Diffr *diffr, int32_t df_n)
 {
     ASSERT(diffr != NULL);
 
+    diffr->df_x0    = df_x0;
+    diffr->df_n     = df_n;
     diffr->root     = NULL;
     diffr->filename = NULL;
 }
@@ -40,10 +42,7 @@ void DiffrDtor(Diffr *diffr)
 
 void DiffrRun(Diffr *diffr)
 {
-    TreeNode *df_node = TaylorSeries(diffr->root, 0, 3, &diffr->logger);
-
-    TreeDtor(diffr->root);
-    diffr->root = df_node;
+    TaylorSeries(diffr->root, df_x0, df_n, &diffr->logger);
 }
 
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
@@ -378,18 +377,34 @@ void SimplifyNeutral(TreeNode *node, Logger *logger)
                 free(LEFT);
 
                 TreeNode *last_right =  RIGHT;
-                     *node       = *RIGHT;
+                         *CURR       = *RIGHT;
 
                 free(last_right);
             }
             break;
+        case OP_SUB:
+            if (IS_ZERO(RIGHT))
+            {
+                free(RIGHT);
+
+                TreeNode *last_left =  LEFT;
+                         *CURR      = *LEFT;
+
+                free(last_left);
+            }
+            else if (IS_ZERO(LEFT))
+            {
+                free(LEFT);
+
+                OP_CTOR(CURR, OP_MUL, CREATE_NUM(-1), RIGHT);
+            }
         case OP_MUL:
             if (IS_ZERO(LEFT))
             {
                 free(LEFT);
                 TreeDtor(RIGHT);
 
-                NUM_CTOR(node, 0);
+                NUM_CTOR(CURR, 0);
             }
             else if (IS_ONE(LEFT))
             {
