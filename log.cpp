@@ -287,12 +287,12 @@ void PrintToFdPlot(TreeNode *node, int32_t fd)
                 WRAP_PRINT(LEFT);
                 dprintf(fd, "%s", GetOperatorStringPlot(GET_OP(CURR)));
 
-                if (IS_OP_CODE(CURR, OP_SIN) || IS_OP_CODE(CURR, OP_COS))
+                if (IS_OP_CODE(CURR, OP_SIN) || IS_OP_CODE(CURR, OP_COS) || IS_OP_CODE(CURR, OP_LN))
                     dprintf(fd, "(");
 
                 WRAP_PRINT(RIGHT);
 
-                if (IS_OP_CODE(CURR, OP_SIN) || IS_OP_CODE(CURR, OP_COS))
+                if (IS_OP_CODE(CURR, OP_SIN) || IS_OP_CODE(CURR, OP_COS) || IS_OP_CODE(CURR, OP_LN))
                     dprintf(fd, ")");
             }
             break;
