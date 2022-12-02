@@ -50,9 +50,12 @@ void DiffrRun(Diffr *diffr)
 {
     TaylorSeries(diffr->root, diffr->df_x0, diffr->df_n, &diffr->logger);
     
-    char latex_filename[512] = "";
+    char cmd            [1024] = "";
+    char latex_filename [512]  = "";
 
-    sprintf(latex_filename, "%s_book.tex", diffr->filename);
+    sprintf(latex_filename,    "%s_book.tex", diffr->filename);
+    sprintf(cmd,            "rm %s_book.pdf", diffr->filename);
+    system(cmd);
 
     int32_t fd = creat(latex_filename, S_IRWXU);
 
@@ -60,7 +63,6 @@ void DiffrRun(Diffr *diffr)
 
     close(fd);
 
-    char cmd[1024] = "";
     sprintf(cmd, "/mnt/c/Users/Timur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe %s", latex_filename);
     system(cmd);
 }
@@ -528,7 +530,10 @@ TreeNode *TaylorSeries(TreeNode *node, double x0, int32_t n, Logger *logger)
         LoggerLog(logger, CONV_TYPE_RESULT_N_DF, df);
     }
 
+    TreeDtor(df);
+
     LoggerLog(logger, CONV_TYPE_RESULT_TAYLOR, result);
+
     return result;
 }
 

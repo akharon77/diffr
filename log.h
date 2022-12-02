@@ -19,5 +19,7 @@ void        DiffrGenerateFdLatexBook    (Diffr *diffr, int32_t fd);
 void        LoggerPrintToFdLatex        (Logger *logger, int32_t fd, int32_t id);
 void        PrintToFdLatex              (TreeNode *node, int32_t fd);
 void        PrintToFdPlot               (TreeNode *node, int32_t fd);
+void        PrintGraphToFile            (TreeNode *node, const char *filename);
 
 #endif  // LOG_H
+

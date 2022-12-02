@@ -97,7 +97,16 @@ void DiffrGenerateFdLatexBook(Diffr *diffr, int32_t fd)
 
     dprintf(fd, "\\chapter{Graph}\n");
 
-    int32_t fd_plot = creat("func_graph.gpi", S_IRWXU);
+    PrintGraphToFile(diffr->root, "func_graph.gpi");
+
+    dprintf(fd, "\\includegraphics[width=\\textwidth]{./func_graph.png}\n");
+
+    dprintf(fd, "\\end{document}\n");
+}
+
+void PrintGraphToFile(TreeNode *node, const char *filename)
+{
+    int32_t fd_plot = creat(filename, S_IRWXU);
 
     dprintf(fd_plot,
             "set xlabel \"X\"\n"
@@ -114,15 +123,13 @@ void DiffrGenerateFdLatexBook(Diffr *diffr, int32_t fd)
             "plot "
             );
 
-    PrintToFdPlot(diffr->root, fd_plot);
+    PrintToFdPlot(node, fd_plot);
 
     close(fd_plot);
 
-    system("gnuplot ./func_graph.gpi");
-
-    dprintf(fd, "\\includegraphics[width=\\textwidth]{./func_graph.png}\n");
-
-    dprintf(fd, "\\end{document}\n");
+    char cmd[512] = "";
+    sprintf(cmd, "gnuplot %s", filename);
+    system(cmd);
 }
 
 const char *GetRandomComment()
