@@ -36,6 +36,7 @@ void        DumpToFile          (TreeNode *node, int32_t fd, int64_t idx);
 
 TreeNode   *Differentiate       (TreeNode *node, Logger *logger);
 TreeNode   *TaylorSeries        (TreeNode *node, double x0, int32_t n, Logger *logger);
+TreeNode   *Tangent(TreeNode *node, double x0, Logger *logger);
 
 double      Evaluate            (TreeNode *node, double x, Logger *logger);
 

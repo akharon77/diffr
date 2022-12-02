@@ -8,7 +8,6 @@ void TreeDump(TreeNode *node, const char *filename);
 void TreeDumpToFile(TreeNode *node, int32_t fd, int64_t idx);
 
 const char *GetOperatorString      (int32_t op_code);
-const char *GetOperatorStringLatex (int32_t op_code);
 
 int32_t GetOperatorPriority        (int32_t op_code);
 

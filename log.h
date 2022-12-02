@@ -14,12 +14,13 @@ const char *GetRandomComment();
 const char *GetConvDesc                 (int32_t type);
 const char *GetGreekAlphabet            (int32_t id);
 const char *GetOperatorStringPlot       (int32_t op_code);
+const char *GetOperatorStringLatex      (int32_t op_code);
 
 void        DiffrGenerateFdLatexBook    (Diffr *diffr, int32_t fd);
 void        LoggerPrintToFdLatex        (Logger *logger, int32_t fd, int32_t id);
 void        PrintToFdLatex              (TreeNode *node, int32_t fd);
 void        PrintToFdPlot               (TreeNode *node, int32_t fd);
-void        PrintGraphToFile            (TreeNode *node, const char *filename);
+void        PrintGraphToFile            (TreeNode *func, TreeNode *tangent, const char *filename);
 
 #endif  // LOG_H
 

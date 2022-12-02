@@ -28,6 +28,7 @@ struct Diffr
 
     Logger    logger;
     TreeNode *root;
+    TreeNode *tangent;
 
     double    df_x0;
     int32_t   df_n;

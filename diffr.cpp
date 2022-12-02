@@ -34,6 +34,7 @@ void DiffrCtor(Diffr *diffr, double df_x0, int32_t df_n)
     diffr->df_x0    = df_x0;
     diffr->df_n     = df_n;
     diffr->root     = NULL;
+    diffr->tangent  = NULL;
     diffr->filename = NULL;
     diffr->logger   = {};
 }
@@ -43,6 +44,7 @@ void DiffrDtor(Diffr *diffr)
     ASSERT(diffr != NULL);
 
     TreeDtor(diffr->root);
+    TreeDtor(diffr->tangent);
     LoggerDtor(&diffr->logger);
     free(diffr->filename);
 }
@@ -50,6 +52,7 @@ void DiffrDtor(Diffr *diffr)
 void DiffrRun(Diffr *diffr)
 {
     TaylorSeries(diffr->root, diffr->df_x0, diffr->df_n, &diffr->logger);
+    diffr->tangent = Tangent(diffr->root, diffr->df_x0, &diffr->logger);
     
     char cmd            [1024] = "";
     char latex_filename [512]  = "";
@@ -601,6 +604,23 @@ double Evaluate(TreeNode *node, double x, Logger *logger)
     free(res_node);
 
     return res;
+}
+
+TreeNode* Tangent(TreeNode *node, double x0, Logger *logger)
+{
+    LoggerLog(logger, CONV_TYPE_BEGIN_TANGENT, node);
+
+    TreeNode *tangent = ADD(
+            MUL(
+                CREATE_NUM(Evaluate(Differentiate(node, logger), x0, logger)),
+                SUB(CREATE_VAR("x"), CREATE_NUM(x0))
+            ),
+            CREATE_NUM(Evaluate(node, x0, logger))
+        );
+
+    LoggerLog(logger, CONV_TYPE_RESULT_TANGENT, tangent);
+
+    return tangent;
 }
 
 #undef CURR

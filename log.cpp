@@ -49,6 +49,8 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
         }
     }
 
+    // TreeDump(node_cpy, "log");
+
     StackPush(&logger->convs, 
               {
                   .type = type, 
@@ -97,14 +99,14 @@ void DiffrGenerateFdLatexBook(Diffr *diffr, int32_t fd)
 
     dprintf(fd, "\\chapter{Graph}\n");
 
-    PrintGraphToFile(diffr->root, "func_graph.gpi");
+    PrintGraphToFile(diffr->root, diffr->tangent, "func_graph.gpi");
 
     dprintf(fd, "\\includegraphics[width=\\textwidth]{./func_graph.png}\n");
 
     dprintf(fd, "\\end{document}\n");
 }
 
-void PrintGraphToFile(TreeNode *node, const char *filename)
+void PrintGraphToFile(TreeNode *func, TreeNode *tangent, const char *filename)
 {
     int32_t fd_plot = creat(filename, S_IRWXU);
 
@@ -123,7 +125,10 @@ void PrintGraphToFile(TreeNode *node, const char *filename)
             "plot "
             );
 
-    PrintToFdPlot(node, fd_plot);
+    PrintToFdPlot(func, fd_plot);
+    dprintf(fd_plot, " title \"func\" lc rgb \"red\", ");
+    PrintToFdPlot(tangent, fd_plot);
+    dprintf(fd_plot, " title \"tang\" lc rgb \"green\"");
 
     close(fd_plot);
 
@@ -144,6 +149,12 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
 
     switch (logger->convs.data[id].type)
     {
+        case CONV_TYPE_BEGIN_TANGENT:
+            dprintf(fd, "Let's find tangent of this function");
+            break;
+        case CONV_TYPE_RESULT_TANGENT:
+            dprintf(fd, "We got tangent");
+            break;
         case CONV_TYPE_EVAL:
             dprintf(fd, "Let's find value of this expression");
             break;
@@ -399,6 +410,29 @@ const char *GetOperatorStringPlot(int32_t op_code)
             return "log";
         default:
             return "(null)";
+    }
+}
+
+const char *GetOperatorStringLatex(int32_t op_code)
+{
+    switch (op_code)
+    {
+        case OP_ADD:
+            return "+";
+        case OP_SUB:
+            return "-";
+        case OP_MUL:
+            return "\\cdot";
+        case OP_SIN:
+            return "\\sin";
+        case OP_COS:
+            return "\\cos";
+        case OP_EXP:
+            return "^";
+        case OP_LN:
+            return "\\ln";
+        default:
+            return "";
     }
 }
 
