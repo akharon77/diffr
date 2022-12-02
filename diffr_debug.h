@@ -4,8 +4,8 @@
 #include "diffr_struct.h"
 #include "tree_struct.h"
 
-void DiffrDump                     (Diffr *diffr);
-void DumpToFile                    (TreeNode *node, int32_t fd, int64_t idx);
+void TreeDump(TreeNode *node, const char *filename);
+void TreeDumpToFile(TreeNode *node, int32_t fd, int64_t idx);
 
 const char *GetOperatorString      (int32_t op_code);
 const char *GetOperatorStringLatex (int32_t op_code);

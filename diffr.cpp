@@ -7,6 +7,7 @@
 #include <ctype.h>
 
 #include "diffr.h"
+#include "diffr_debug.h"
 #include "tree.h"
 #include "iostr.h"
 #include "stack.h"
@@ -528,6 +529,8 @@ TreeNode *TaylorSeries(TreeNode *node, double x0, int32_t n, Logger *logger)
         Simplify(result, logger);
 
         LoggerLog(logger, CONV_TYPE_RESULT_N_DF, df);
+
+        TreeDump(df, "df");
     }
 
     TreeDtor(df);
@@ -556,7 +559,12 @@ double Evaluate(TreeNode *node, double x, Logger *logger)
             res = GET_NUM(CURR);
             break;
         case NODE_TYPE_VAR:
-            res = x;
+            {
+                if (strcasecmp(GET_VAR(CURR), "x") == 0)
+                    res = x;
+                else
+                    res = Evaluate(RIGHT, x, logger);
+            }
             break;
         case NODE_TYPE_OP:
             switch (GET_OP(CURR))

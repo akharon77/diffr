@@ -6,7 +6,7 @@
 
 #define OP_CTOR(node, val, lhs, rhs) TreeNodeCtor   (node,     NODE_TYPE_OP,  {.op  = val},          lhs,  rhs)
 
-#define VAR_CTOR(node, val)         TreeNodeCtor   (node,     NODE_TYPE_VAR, {.var = strdup(val)}, NULL, NULL)
+#define VAR_CTOR(node, val, subst)         TreeNodeCtor   (node,     NODE_TYPE_VAR, {.var = strdup(val)}, NULL, subst)
 #define CREATE_VAR(val)             CreateTreeNode (          NODE_TYPE_VAR, {.var = strdup(val)}, NULL, NULL)
 
 #define LEFT                        (CURR)->left

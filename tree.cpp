@@ -69,6 +69,9 @@ void   TreeNodeCtor(TreeNode *node, int32_t type, TreeNodeValue value, TreeNode 
             .left  = left,
             .right = right 
         };
+
+    if (type == NODE_TYPE_VAR)
+        node->size = 1;
 }
 
 TreeNode *CreateTreeNode(int32_t type, TreeNodeValue val, TreeNode *left, TreeNode *right)

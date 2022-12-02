@@ -6,23 +6,23 @@
 #include "diffr_debug.h"
 #include "dsl.h"
 
-void DiffrDump(Diffr *diffr)
+void TreeDump(TreeNode *node, const char *filename)
 {
-    ASSERT(diffr != NULL);
+    ASSERT(node != NULL);
 
     static int32_t cnt = 0;
 
     char filename_txt[512] = "",
          filename_svg[512] = "";
 
-    sprintf(filename_txt, "dump/difft_%s_%d.txt", diffr->filename, cnt);
-    sprintf(filename_svg, "dump/diffr_%s_%d.svg", diffr->filename, cnt++);
+    sprintf(filename_txt, "dump/%s_%d.txt", filename, cnt);
+    sprintf(filename_svg, "dump/%s_%d.svg", filename, cnt++);
 
     int32_t fd = creat(filename_txt, S_IRWXU);
     ASSERT(fd != -1);
 
     dprintf(fd, "digraph G {\n");
-    DumpToFile(diffr->root, fd, 0);
+    TreeDumpToFile(node, fd, 0);
     dprintf(fd, "}\n");
 
     close(fd);
@@ -34,7 +34,7 @@ void DiffrDump(Diffr *diffr)
 
 #define CURR node
 
-void DumpToFile(TreeNode *node, int32_t fd, int64_t idx)
+void TreeDumpToFile(TreeNode *node, int32_t fd, int64_t idx)
 {
     const char *type_str   = "";
           char  value[256] = "";
@@ -61,13 +61,13 @@ void DumpToFile(TreeNode *node, int32_t fd, int64_t idx)
     if (LEFT)
     {
         dprintf(fd, "node%ld->node%ld;", idx, 2 * idx + 1);
-        DumpToFile(LEFT,  fd, 2 * idx + 1);
+        TreeDumpToFile(LEFT,  fd, 2 * idx + 1);
     }
 
     if (RIGHT)
     {
         dprintf(fd, "node%ld->node%ld;", idx, 2 * idx + 2);
-        DumpToFile(RIGHT, fd, 2 * idx + 2);
+        TreeDumpToFile(RIGHT, fd, 2 * idx + 2);
     }
 }
 

@@ -364,13 +364,15 @@ void LoggerReplace(Logger *logger, TreeNode *node)
 {
     LoggerLog(logger, CONV_TYPE_REPL, node);
 
+    TreeNode *node_subst = TreeCopy(node);
+
     if (LEFT)
         TreeDtor(node->left);
 
     if (RIGHT)
         TreeDtor(node->right);
 
-    VAR_CTOR(node, GetGreekAlphabet(logger->n_repl++));
+    VAR_CTOR(node, GetGreekAlphabet(logger->n_repl++), node_subst);
     
     LoggerLog(logger, CONV_TYPE_RESULT, node);
 }
