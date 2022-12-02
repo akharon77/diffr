@@ -58,8 +58,10 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
     // ((Diffr*) logger->diffr)->root = buf;
 }
 
-void GenerateToFdLatexBook(Logger *logger, int32_t fd)
+void DiffrGenerateFdLatexBook(Diffr *diffr, int32_t fd)
 {
+    Logger *logger = &diffr->logger;
+
     dprintf(fd, "\\documentclass[12pt, letterpaper]{book}\n"
 
                 "\\usepackage[utf8]{inputenc}\n"
@@ -92,6 +94,31 @@ void GenerateToFdLatexBook(Logger *logger, int32_t fd)
 
     dprintf(fd, "\\chapter{Graph}\n");
 
+    int32_t fd_plot = creat("func_graph.gpi", S_IRWXU);
+
+    dprintf(fd_plot,
+            "set xlabel \"X\"\n"
+            "set ylabel \"Y\"\n"
+            "set grid\n"
+           );
+
+
+    dprintf(fd_plot, 
+            "\n"
+            "set samples 1000\n"
+            "set terminal png size 800, 600\n"
+            "set output \"func_graph.png\"\n"
+            "plot "
+            );
+
+    PrintToFdPlot(diffr->root, fd_plot);
+
+    close(fd_plot);
+
+    system("gnuplot ./func_graph.gpi");
+
+    dprintf(fd, "\\includegraphics[width=\\textwidth]{./func_graph.png}\n");
+
     dprintf(fd, "\\end{document}\n");
 }
 
@@ -120,7 +147,9 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
             break;
         case CONV_TYPE_BEGIN_TAYLOR:
             dprintf(fd, 
+                    "\\LARGE\n"
                     "\\chapter{Taylor series}"
+                    "\\normalsize\n"
                     "Let's find Taylor series expansion");
             break;
         case CONV_TYPE_RESULT_N_DF:
@@ -157,12 +186,12 @@ do                                                                              
     if (node)                                                                                       \
     {                                                                                               \
         if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
-            dprintf(fd, "\\left(");                                                                 \
+            dprintf(fd, "{\\left(");                                                                 \
                                                                                                     \
         PrintToFdLatex(node, fd);                                                                   \
                                                                                                     \
         if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
-            dprintf(fd, "\\right)");                                                                \
+            dprintf(fd, "\\right)}");                                                                \
     }                                                                                               \
 }                                                                                                   \
 while (0)
@@ -204,6 +233,50 @@ void PrintToFdLatex(TreeNode *node, int32_t fd)
     }
 
     dprintf(fd, "}");
+}
+
+#undef WRAP_PRINT
+#define WRAP_PRINT(node)                                                                            \
+do                                                                                                  \
+{                                                                                                   \
+    if (node)                                                                                       \
+    {                                                                                               \
+        if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
+            dprintf(fd, "(");                                                                       \
+                                                                                                    \
+        PrintToFdPlot(node, fd);                                                                    \
+                                                                                                    \
+        if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
+            dprintf(fd, ")");                                                                       \
+    }                                                                                               \
+}                                                                                                   \
+while (0)
+
+void PrintToFdPlot(TreeNode *node, int32_t fd)
+{
+    switch (GET_TYPE(CURR))
+    {
+        case NODE_TYPE_NUM:
+            dprintf(fd, "%g", GET_NUM(CURR));
+            break;
+        case NODE_TYPE_VAR:
+            dprintf(fd, "%s", GET_VAR(CURR));
+            break;
+        case NODE_TYPE_OP:
+            {
+                WRAP_PRINT(LEFT);
+                dprintf(fd, "%s", GetOperatorStringPlot(GET_OP(CURR)));
+
+                if (IS_OP_CODE(CURR, OP_SIN) || IS_OP_CODE(CURR, OP_COS))
+                    dprintf(fd, "(");
+
+                WRAP_PRINT(RIGHT);
+
+                if (IS_OP_CODE(CURR, OP_SIN) || IS_OP_CODE(CURR, OP_COS))
+                    dprintf(fd, ")");
+            }
+            break;
+    }
 }
 
 const char *GetConvDesc(int32_t type)
@@ -290,6 +363,31 @@ void LoggerReplace(Logger *logger, TreeNode *node)
     VAR_CTOR(node, GetGreekAlphabet(logger->n_repl++));
     
     LoggerLog(logger, CONV_TYPE_RESULT, node);
+}
+
+const char *GetOperatorStringPlot(int32_t op_code)
+{
+    switch (op_code)
+    {
+        case OP_ADD:
+            return "+";
+        case OP_SUB:
+            return "-";
+        case OP_MUL:
+            return "*";
+        case OP_DIV:
+            return "/";
+        case OP_SIN:
+            return "sin";
+        case OP_COS:
+            return "cos";
+        case OP_EXP:
+            return "**";
+        case OP_LN:
+            return "log";
+        default:
+            return "(null)";
+    }
 }
 
 #undef CURR

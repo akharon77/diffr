@@ -55,7 +55,7 @@ int32_t main(int32_t argc, const char *argv[])
     DiffrDump(&diffr);
 
     int32_t fd = creat("output.tex", S_IRWXU);
-    GenerateToFdLatexBook(&diffr.logger, fd);
+    DiffrGenerateFdLatexBook(&diffr, fd);
     close(fd);
     
     DiffrDtor(&diffr);

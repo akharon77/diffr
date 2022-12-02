@@ -48,6 +48,5 @@ void        RotateCommutative   (TreeNode *node);
 void        RotateSizeMin       (TreeNode *node);
 
 const char *GetOperatorString   (int32_t op_code);
-int32_t     GetOperatorPriority (int32_t op_code);
 
 #endif  // DIFFR_H

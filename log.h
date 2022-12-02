@@ -13,9 +13,11 @@ void        LoggerReplace               (Logger *logger, TreeNode *node);
 const char *GetRandomComment();
 const char *GetConvDesc                 (int32_t type);
 const char *GetGreekAlphabet            (int32_t id);
+const char *GetOperatorStringPlot       (int32_t op_code);
 
-void        GenerateToFdLatexBook       (Logger *logger, int32_t fd);
+void        DiffrGenerateFdLatexBook    (Diffr *diffr, int32_t fd);
 void        LoggerPrintToFdLatex        (Logger *logger, int32_t fd, int32_t id);
 void        PrintToFdLatex              (TreeNode *node, int32_t fd);
+void        PrintToFdPlot               (TreeNode *node, int32_t fd);
 
 #endif  // LOG_H
