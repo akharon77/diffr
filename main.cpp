@@ -49,15 +49,9 @@ int32_t main(int32_t argc, const char *argv[])
 
     DiffrCtor(&diffr, df_x0, df_n);
     DiffrInput(&diffr, filename, &err);
-    DiffrDump(&diffr);
 
     DiffrRun(&diffr);
-    DiffrDump(&diffr);
 
-    int32_t fd = creat("output.tex", S_IRWXU);
-    DiffrGenerateFdLatexBook(&diffr, fd);
-    close(fd);
-    
     DiffrDtor(&diffr);
 
     return 0;

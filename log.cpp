@@ -19,6 +19,9 @@ void LoggerCtor(Logger *logger, Diffr *diffr)
 
 void LoggerDtor(Logger *logger)
 {
+    for (int32_t i = 0; i < logger->convs.size; ++i)
+        TreeDtor(logger->convs.data[i].node);
+
     StackDtor(&logger->convs);
 
     free(logger->filename);

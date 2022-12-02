@@ -3,9 +3,9 @@
 
 typedef union
 {
-    double      dbl;
-    int32_t     op;
-    const char *var;
+    double  dbl;
+    int32_t op;
+    char    *var;
 } TreeNodeValue;
 
 struct TreeNode

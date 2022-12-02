@@ -34,6 +34,7 @@ void DiffrCtor(Diffr *diffr, double df_x0, int32_t df_n)
     diffr->df_n     = df_n;
     diffr->root     = NULL;
     diffr->filename = NULL;
+    diffr->logger   = {};
 }
 
 void DiffrDtor(Diffr *diffr)
@@ -41,12 +42,27 @@ void DiffrDtor(Diffr *diffr)
     ASSERT(diffr != NULL);
 
     TreeDtor(diffr->root);
+    LoggerDtor(&diffr->logger);
     free(diffr->filename);
 }
 
 void DiffrRun(Diffr *diffr)
 {
     TaylorSeries(diffr->root, diffr->df_x0, diffr->df_n, &diffr->logger);
+    
+    char latex_filename[512] = "";
+
+    sprintf(latex_filename, "%s_book.tex", diffr->filename);
+
+    int32_t fd = creat(latex_filename, S_IRWXU);
+
+    DiffrGenerateFdLatexBook(diffr, fd);
+
+    close(fd);
+
+    char cmd[1024] = "";
+    sprintf(cmd, "/mnt/c/Users/Timur/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe %s", latex_filename);
+    system(cmd);
 }
 
 void DiffrInput(Diffr *diffr, const char *filename, int32_t *err)
