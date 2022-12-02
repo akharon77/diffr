@@ -146,7 +146,16 @@ TreeNode* Differentiate(TreeNode *node, Logger *logger)
                     {
                         LoggerLog(logger, CONV_TYPE_DIV, CURR);
                         // logger->n_repl = 0;
-                        result = DIV(SUB(MUL(D_L, CP_R), MUL(CP_L, D_R)), EXP(CP_R, CREATE_NUM(2)));
+                        result = 
+                            DIV
+                            (
+                                SUB
+                                (
+                                    MUL(D_L, CP_R), 
+                                    MUL(CP_L, D_R)
+                                ),
+                                EXP(CP_R, CREATE_NUM(2))
+                            );
                     }
                 break;
 
@@ -610,13 +619,18 @@ TreeNode* Tangent(TreeNode *node, double x0, Logger *logger)
 {
     LoggerLog(logger, CONV_TYPE_BEGIN_TANGENT, node);
 
-    TreeNode *tangent = ADD(
-            MUL(
+    TreeNode *tangent = 
+        ADD
+        (
+            MUL
+            (
                 CREATE_NUM(Evaluate(Differentiate(node, logger), x0, logger)),
                 SUB(CREATE_VAR("x"), CREATE_NUM(x0))
             ),
             CREATE_NUM(Evaluate(node, x0, logger))
         );
+
+    Simplify(tangent, logger);
 
     LoggerLog(logger, CONV_TYPE_RESULT_TANGENT, tangent);
 

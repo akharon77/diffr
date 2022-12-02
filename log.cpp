@@ -119,7 +119,7 @@ void PrintGraphToFile(TreeNode *func, TreeNode *tangent, const char *filename)
 
     dprintf(fd_plot, 
             "\n"
-            "set samples 1000\n"
+            "set samples 10000\n"
             "set terminal png size 800, 600\n"
             "set output \"func_graph.png\"\n"
             "plot "
@@ -150,7 +150,11 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
     switch (logger->convs.data[id].type)
     {
         case CONV_TYPE_BEGIN_TANGENT:
-            dprintf(fd, "Let's find tangent of this function");
+            dprintf(fd, 
+                    "\\LARGE\n"
+                    "\\chapter{Tangent}\n"
+                    "\\normalsize\n"
+                    "Let's find tangent of this function");
             break;
         case CONV_TYPE_RESULT_TANGENT:
             dprintf(fd, "We got tangent");
