@@ -56,11 +56,6 @@ void LoggerLog(Logger *logger, int32_t type, TreeNode *node)
                   .type = type, 
                   .node = node_cpy
               });
-
-    // TreeNode *buf = ((Diffr*) logger->diffr)->root;
-    // ((Diffr*) logger->diffr)->root = node_cpy;
-    // DiffrDump((Diffr*) logger->diffr);
-    // ((Diffr*) logger->diffr)->root = buf;
 }
 
 void DiffrGenerateFdLatexBook(Diffr *diffr, int32_t fd)
@@ -211,12 +206,12 @@ do                                                                              
     if (node)                                                                                       \
     {                                                                                               \
         if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
-            dprintf(fd, "{\\left(");                                                                 \
+            dprintf(fd, "{\\left(");                                                                \
                                                                                                     \
         PrintToFdLatex(node, fd);                                                                   \
                                                                                                     \
         if (IS_OP(node) && GetOperatorPriority(GET_OP(node)) < GetOperatorPriority(GET_OP(CURR)))   \
-            dprintf(fd, "\\right)}");                                                                \
+            dprintf(fd, "\\right)}");                                                               \
     }                                                                                               \
 }                                                                                                   \
 while (0)
@@ -232,7 +227,7 @@ void PrintToFdLatex(TreeNode *node, int32_t fd)
                 if (GET_NUM(CURR) < -EPS)
                     dprintf(fd, "(");
 
-                dprintf(fd, "%lg", GET_NUM(CURR));
+                dprintf(fd, "%lf", GET_NUM(CURR));
 
                 if (GET_NUM(CURR) < -EPS)
                     dprintf(fd, ")");
@@ -282,7 +277,7 @@ void PrintToFdPlot(TreeNode *node, int32_t fd)
     switch (GET_TYPE(CURR))
     {
         case NODE_TYPE_NUM:
-            dprintf(fd, "%g", GET_NUM(CURR));
+            dprintf(fd, "%lf", GET_NUM(CURR));
             break;
         case NODE_TYPE_VAR:
             dprintf(fd, "%s", GET_VAR(CURR));

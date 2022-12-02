@@ -129,14 +129,20 @@ const char *GetPrimary(const char *str, TreeNode *value)
 
 const char *GetNumber(const char *str, TreeNode *value)
 {
-    int32_t res = 0;
+    double res = 0;
     const char *str_old = str;
 
-    while ('0' <= *str && *str <= '9')
-    {
-        res = res * 10 + *str - '0';
-        ++str;
-    }
+    int32_t offset = 0;
+
+    sscanf(str, "%lf%n", &res, &offset);
+
+    // while ('0' <= *str && *str <= '9')
+    // {
+    //     res = res * 10 + *str - '0';
+    //     ++str;
+    // }
+    
+    str += offset;
 
     assert(str != str_old);
 
