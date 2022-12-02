@@ -83,10 +83,14 @@ void GenerateToFdLatexBook(Logger *logger, int32_t fd)
                 "\\maketitle\n"
 
                 "\\tableofcontents\n"
+
+                "\\newpage\n"
                 );
 
     for (int32_t i = 0; i < logger->convs.size; ++i)
         LoggerPrintToFdLatex(logger, fd, i);
+
+    dprintf(fd, "\\chapter{Graph}\n");
 
     dprintf(fd, "\\end{document}\n");
 }
@@ -108,7 +112,9 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
             break;
         case CONV_TYPE_BEGIN_N_DF:
             dprintf(fd, 
-                    "\\subsection{$\\frac{df}{dx}$}\n"
+                    "\\LARGE\n"
+                    "\\section{$\\frac{df}{dx}$}\n"
+                    "\\normalsize\n"
                     "Let's find the next derivative of the function"
                     );
             break;

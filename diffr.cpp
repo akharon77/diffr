@@ -486,11 +486,11 @@ void RotateCommutative(TreeNode *node)
 
 TreeNode *TaylorSeries(TreeNode *node, double x0, int32_t n, Logger *logger)
 {
+    LoggerLog(logger, CONV_TYPE_BEGIN_TAYLOR, CURR);
+
     TreeNode *result = CREATE_NUM(Evaluate(CURR, x0, logger));
     TreeNode *df     = TreeCopy(CURR);
     double    fac    = 1;
-
-    LoggerLog(logger, CONV_TYPE_BEGIN_TAYLOR, df);
 
     for (int32_t i = 1; i < n + 1; ++i)
     {
