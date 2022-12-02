@@ -486,22 +486,26 @@ void RotateCommutative(TreeNode *node)
 
 TreeNode *TaylorSeries(TreeNode *node, double x0, int32_t n, Logger *logger)
 {
-    TreeNode *result = CREATE_NUM(0);
-    TreeNode *df     = TreeCopy(node);
+    TreeNode *result = CREATE_NUM(Evaluate(CURR, x0, logger));
+    TreeNode *df     = TreeCopy(CURR);
     double    fac    = 1;
 
-    for (int32_t i = 0; i < n + 1; ++i)
+    LoggerLog(logger, CONV_TYPE_BEGIN_TAYLOR, df);
+
+    for (int32_t i = 1; i < n + 1; ++i)
     {
-        TreeNode *mid_res = ADD(TreeCopy(result), MUL(DIV(CREATE_NUM(Evaluate(df, x0, logger)), CREATE_NUM(fac)), EXP(SUB(CREATE_VAR("x"), CREATE_NUM(x0)), CREATE_NUM(i))));
+        LoggerLog(logger, CONV_TYPE_BEGIN_N_DF, df);
 
         TreeNode *next_df = Differentiate(df, logger);
+        fac    *= i;
 
         TreeDtor(df);
-        TreeDtor(result);
-
         df      = next_df;
+
+        TreeNode *mid_res = ADD(TreeCopy(result), MUL(DIV(CREATE_NUM(Evaluate(df, x0, logger)), CREATE_NUM(fac)), EXP(SUB(CREATE_VAR("x"), CREATE_NUM(x0)), CREATE_NUM(i))));
+
+        TreeDtor(result);
         result  = mid_res;
-        fac    *= i + 1;
 
         Simplify(result, logger);
 
@@ -516,6 +520,9 @@ double Evaluate(TreeNode *node, double x, Logger *logger)
 {
     double lhs = 0;
     double rhs = 0;
+    double res = 0;
+
+    LoggerLog(logger, CONV_TYPE_EVAL, node);
 
     if (LEFT)
         lhs = Evaluate(LEFT,  x, logger);
@@ -525,30 +532,46 @@ double Evaluate(TreeNode *node, double x, Logger *logger)
     switch (GET_TYPE(CURR))
     {
         case NODE_TYPE_NUM:
-            return GET_NUM(CURR);
+            res = GET_NUM(CURR);
+            break;
         case NODE_TYPE_VAR:
-            return x;
+            res = x;
+            break;
         case NODE_TYPE_OP:
             switch (GET_OP(CURR))
             {
                 case OP_ADD:
-                    return lhs + rhs;
+                    res = lhs + rhs;
+                    break;
                 case OP_SUB:
-                    return lhs - rhs;
+                    res = lhs - rhs;
+                    break;
                 case OP_MUL:
-                    return lhs * rhs;
+                    res = lhs * rhs;
+                    break;
                 case OP_DIV:
-                    return lhs / rhs;
+                    res = lhs / rhs;
+                    break;
                 case OP_SIN:
-                    return sin(rhs);
+                    res = sin(rhs);
+                    break;
                 case OP_COS:
-                    return cos(rhs);
+                    res = cos(rhs);
+                    break;
                 case OP_EXP:
-                    return exp(log(lhs) * rhs);
+                    res = exp(log(lhs) * rhs);
+                    break;
                 case OP_LN:
-                    return log(rhs);
+                    res = log(rhs);
+                    break;
             }
     }
+
+    TreeNode *res_node = CREATE_NUM(res);
+    LoggerLog(logger, CONV_TYPE_RESULT, res_node);
+    free(res_node);
+
+    return res;
 }
 
 #undef CURR

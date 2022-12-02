@@ -76,11 +76,14 @@ void GenerateToFdLatexBook(Logger *logger, int32_t fd)
                 "\\pagestyle{fancy}\n"
 
                 "\\begin{document}\n"
-
+                
                 "\\title{Differentiating functions}\n"
                 "\\author{Abdullin Timur Arturovich}\n"
 
-                "\\maketitle\n");
+                "\\maketitle\n"
+
+                "\\tableofcontents\n"
+                );
 
     for (int32_t i = 0; i < logger->convs.size; ++i)
         LoggerPrintToFdLatex(logger, fd, i);
@@ -100,6 +103,20 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
 
     switch (logger->convs.data[id].type)
     {
+        case CONV_TYPE_EVAL:
+            dprintf(fd, "Let's find value of this expression");
+            break;
+        case CONV_TYPE_BEGIN_N_DF:
+            dprintf(fd, 
+                    "\\subsection{$\\frac{df}{dx}$}\n"
+                    "Let's find the next derivative of the function"
+                    );
+            break;
+        case CONV_TYPE_BEGIN_TAYLOR:
+            dprintf(fd, 
+                    "\\chapter{Taylor series}"
+                    "Let's find Taylor series expansion");
+            break;
         case CONV_TYPE_RESULT_N_DF:
             dprintf(fd, "We got the next derivative of the function");
             break;
@@ -119,7 +136,7 @@ void LoggerPrintToFdLatex(Logger *logger, int32_t fd, int32_t id)
             dprintf(fd, "Let's try to simplify neutral elements");
             break;
         default:
-            dprintf(fd, "Let's  use the rule of differentiating %s", GetConvDesc(logger->convs.data[id].type));
+            dprintf(fd, "Let's use the rule of differentiating %s", GetConvDesc(logger->convs.data[id].type));
     }
     dprintf(fd, ":\n}\n\n");
 
@@ -217,7 +234,7 @@ const char *GetConvDesc(int32_t type)
 
 const char *GetGreekAlphabet(int32_t id)
 {
-    static const char* const latex_greek[] =
+    static const char* latex_greek[] =
         {
             "\\alpha",
             "\\beta",
@@ -245,15 +262,12 @@ const char *GetGreekAlphabet(int32_t id)
             "\\Psi",
             "\\Xi",
             "\\O",
-            "\\Delta",
-            "\\Mu",
-            "\\Nu",
-            "\\Rho"
+            "\\Delta"
         };
 
     static char res_var[512] = "";
 
-    sprintf(res_var, "{%s}_{%d}", latex_greek[id % 30], id / 30);
+    sprintf(res_var, "{%s}_{%d}", latex_greek[id % 26], id / 26);
     return res_var;
 }
 
